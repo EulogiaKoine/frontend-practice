@@ -1,1 +1,1 @@
-# frantend-practice
+# frontend-practice
