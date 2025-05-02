@@ -1,0 +1,15 @@
+﻿1. 로컬 폰트 적용하는 법
+@font-face {
+    font-family: "적용할 폰트명";
+    font-weight: 두께(100n or bold 등);
+    src: url(ttf등 폰트 파일명)
+}
+- 두께별로 따로 적용해주어고 동일 font-family 이름으로 사용하면 두께 변경 가능. 당연하지만 animatable=false.
+
+
+2. 페이지 제작 플랜
+  a. 기획 & 설계
+  b. 디자인
+  c. 문서 구조 구축(html)
+  d. 디자인 & 스타일링(css)
+  e. 기능 추가(js)

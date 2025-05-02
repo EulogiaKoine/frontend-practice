@@ -1,0 +1,63 @@
+﻿body {
+    font-family: 'Futura PT', Arial, Helvetica, sans-serif;
+    line-height: 1.5;
+    font-weight: normal;
+    color: #000;
+}
+
+#logo {
+    margin: 0.3rem 1rem;
+}
+
+#menu {
+    width: 100%;
+    display: flex;
+    font-size: 16px;
+    border-bottom: 1px solid lightgray;
+}
+
+.menu-list {
+    display: flex;
+    width: 100%;
+    list-style-type: none;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1rem;
+}
+
+.menu-item {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 0px;
+    padding-left: 0px;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+.menu-item:nth-child(n+1) {
+    padding: inherit 1rem;
+}
+/* .menu-item:nth-last-child(2) {
+    margin-left: auto;
+} */
+.menu-item:nth-last-child(3) {
+    color: #ff764d;
+}
+
+span { 
+    font-size: 1.2em;
+}
+
+p {
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none; /* 밑줄 제거 */
+    color: inherit; /* 부모 요소의 색상 상속 */
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }

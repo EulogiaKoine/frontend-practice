@@ -1,0 +1,36 @@
+﻿/* Futura PT */
+@font-face {
+    font-family: 'Futura PT';
+    src: url('../fonts/Futura/FuturaCyrillicLight.ttf');
+    font-weight: 300;
+}
+@font-face {
+    font-family: 'Futura PT';
+    src: url('../fonts/Futura/FuturaCyrillicBook.ttf');
+    font-weight: 400;
+}
+@font-face {
+    font-family: 'Futura PT';
+    src: url('../fonts/Futura/FuturaCyrillicMedium.ttf');
+    font-weight: 500;
+}
+@font-face {
+    font-family: 'Futura PT';
+    src: url('../fonts/Futura/FuturaCyrillicDemi.ttf');
+    font-weight: 600;
+}
+@font-face {
+    font-family: 'Futura PT';
+    src: url('../fonts/Futura/FuturaCyrillicBold.ttf');
+    font-weight: 700;
+}
+@font-face {
+    font-family: 'Futura PT';
+    src: url('../fonts/Futura/FuturaCyrillicExtraBold.ttf');
+    font-weight: 800;
+}
+@font-face {
+    font-family: 'Futura PT';
+    src: url('../fonts/Futura/FuturaCyrillicHeavy.ttf');
+    font-weight: 900;
+}
