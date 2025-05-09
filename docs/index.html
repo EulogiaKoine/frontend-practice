@@ -6,6 +6,7 @@
         <title>2025 FrontEnd - Koine</title>
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/base.css">
+        <link rel="stylesheet" href="css/yeah.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
@@ -47,9 +48,24 @@
             <p>2025년 Clab 프론트엔드 스터디</p>
             <p>참여자 오경석의 연습용 페이지 모음입니다.</p>
             <hr>
-            <ol>
-                <li><a href="exercises/Ableton/index.html">Ableton(4.15)</a></li>
-            </ol>
+            <div class="responsive-grid">
+                <div class="border-box shadow-box" style="box-sizing: content-box; padding: 1em;">
+                    <a href="exercises/Ableton/index.html" style="font-size: 1em;" target="_blank">🔗</a>
+                    <h4 style="display: inline; padding: 5px;" id="Ableton-Review">Ableton</h4>
+                    <p style="font-family: Arial, Helvetica, sans-serif; display: none;">
+                        2025. 4. 11 ~ 2025. 5. 9
+                    </p>
+                </div>
+                <script>
+                    const ableton_title = document.getElementById("Ableton-Review")
+                    ableton_title.addEventListener("click", e => {
+                        if(window.getComputedStyle(ableton_title.nextElementSibling).display === "none")
+                            ableton_title.nextElementSibling.style.display = "block";
+                        else
+                            ableton_title.nextElementSibling.style.display = "none";
+                    })
+                </script>
+            </div>
         </main>
     </body>
 </html>

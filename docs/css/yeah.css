@@ -1,0 +1,35 @@
+/* layouts */
+.responsive-grid {
+    display: grid;
+    grid-auto-rows: auto;
+    /* grid-auto-flow: row; */ /* default */
+}
+@media (min-width: 320px) { /* smartphones */
+    .responsive-grid {
+        grid-template-columns: 1fr;
+    }
+}
+@media (min-width: 1024px) { /* laptops and desktops */
+    .responsive-grid {
+        grid-template-columns: repeat(6, 1fr)
+    }
+}
+
+
+/* box-styling */
+.round-box {
+    display: block;
+    border-radius: 50px;
+}
+
+.shadow-box {
+    border-color: rgba(0, 0, 0, 0.3);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    transition: box-shadow 0.3s ease-in-out;
+}
+.shadow-box:hover {
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.4);
+}
+
+
+/* 게시판 스타일링 */
