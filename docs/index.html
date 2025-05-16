@@ -65,6 +65,23 @@
                             ableton_title.nextElementSibling.style.display = "none";
                     })
                 </script>
+
+                <div class="border-box shadow-box" style="box-sizing: content-box; padding: 1em;">
+                    <a href="exercises/Abstract/index.html" style="font-size: 1em;" target="_blank">🔗</a>
+                    <h4 style="display: inline; padding: 5px;" id="Abstract-Review">Abstract</h4>
+                    <p style="font-family: Arial, Helvetica, sans-serif; display: none;">
+                        2025. 5. 11 ~
+                    </p>
+                </div>
+                <script>
+                    const abstract_title = document.getElementById("Abstract-Review")
+                    abstract_title.addEventListener("click", e => {
+                        if(window.getComputedStyle(abstract_title.nextElementSibling).display === "none")
+                            abstract_title.nextElementSibling.style.display = "block";
+                        else
+                            abstract_title.nextElementSibling.style.display = "none";
+                    })
+                </script>
             </div>
         </main>
     </body>

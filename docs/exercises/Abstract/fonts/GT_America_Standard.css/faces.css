@@ -1,0 +1,106 @@
+/* GT America Standard | 100–900 weights, normal & italic */
+@font-face {
+  font-family: 'GT America Standard';
+  font-style: normal;
+  font-weight: 100;
+  src: url('GT-America-Standard-Ultra-Light-Trial.woff') format('woff');
+}
+@font-face {
+  font-family: 'GT America Standard';
+  font-style: italic;
+  font-weight: 100;
+  src: url('GT-America-Standard-Ultra-Light-Italic-Trial.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'GT America Standard';
+  font-style: normal;
+  font-weight: 200;
+  src: url('GT-America-Standard-Thin-Trial.woff') format('woff');
+}
+@font-face {
+  font-family: 'GT America Standard';
+  font-style: italic;
+  font-weight: 200;
+  src: url('GT-America-Standard-Thin-Italic-Trial.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'GT America Standard';
+  font-style: normal;
+  font-weight: 300;
+  src: url('GT-America-Standard-Light-Trial.woff') format('woff');
+}
+@font-face {
+  font-family: 'GT America Standard';
+  font-style: italic;
+  font-weight: 300;
+  src: url('GT-America-Standard-Light-Italic-Trial.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'GT America Standard';
+  font-style: normal;
+  font-weight: 400;
+  src: url('GT-America-Standard-Regular-Trial.woff') format('woff');
+}
+@font-face {
+  font-family: 'GT America Standard';
+  font-style: italic;
+  font-weight: 400;
+  src: url('GT-America-Standard-Regular-Italic-Trial.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'GT America Standard';
+  font-style: normal;
+  font-weight: 500;
+  src: url('GT-America-Standard-Medium-Trial.woff') format('woff');
+}
+@font-face {
+  font-family: 'GT America Standard';
+  font-style: italic;
+  font-weight: 500;
+  src: url('GT-America-Standard-Medium-Italic-Trial.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'GT America Standard';
+  font-style: normal;
+  font-weight: 600;
+  /* no dedicated 600 file—fallback to Bold */
+  src: url('GT-America-Standard-Bold-Trial.woff') format('woff');
+}
+@font-face {
+  font-family: 'GT America Standard';
+  font-style: italic;
+  font-weight: 600;
+  /* no dedicated 600-italic file—fallback to Bold-Italic */
+  src: url('GT-America-Standard-Bold-Italic-Trial.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'GT America Standard';
+  font-style: normal;
+  font-weight: 700;
+  src: url('GT-America-Standard-Bold-Trial.woff') format('woff');
+}
+@font-face {
+  font-family: 'GT America Standard';
+  font-style: italic;
+  font-weight: 700;
+  src: url('GT-America-Standard-Bold-Italic-Trial.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'GT America Standard';
+  font-style: normal;
+  font-weight: 900;
+  src: url('GT-America-Standard-Black-Trial.woff') format('woff');
+}
+@font-face {
+  font-family: 'GT America Standard';
+  font-style: italic;
+  font-weight: 900;
+  src: url('GT-America-Standard-Black-Italic-Trial.woff') format('woff');
+}

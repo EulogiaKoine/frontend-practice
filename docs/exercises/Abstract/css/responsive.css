@@ -1,0 +1,44 @@
+@media screen and (max-width: 1200px) {
+    .submit-request, .sign-in {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    /* 헤더 좌우 패딩 제거 */
+    .header-outer {
+        padding: 0 10px;
+    }
+    .header-container {
+        width: 100%;
+    }
+    /* 제목 크기 줄이기 */
+    .search-intro {
+        font-size: 64px;
+    }
+    /* 본문 1열, footer 2열로 전환 */
+    .content {
+        width: 100%;
+    }
+    .footer-inner-layout {
+        grid-template-columns: 1fr 1fr;
+        row-gap: 2rem;
+        padding-bottom: 200px;
+    }
+}
+
+
+@media screen and (max-width: 500px) {
+    .search-intro {
+        font-size: 40px;
+    }
+    .help-center {
+        transition-property: margin-left, padding-left;
+        transition-duration: 0.1s;
+        transition-timing-function: ease-in;
+        margin-left: 0.4rem;
+        padding-left: 0.4rem;
+    }
+}
+
+
