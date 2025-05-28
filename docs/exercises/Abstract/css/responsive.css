@@ -1,6 +1,19 @@
+@media screen and (min-width: 1201px) {
+    .menu-shorten {
+        display: none;
+    }
+}
+
+
 @media screen and (max-width: 1200px) {
+    /* 메뉴 */
     .submit-request, .sign-in {
         display: none;
+    }
+
+    /* shorten menu */
+    .menu-shorten {
+        display:flex;
     }
 }
 

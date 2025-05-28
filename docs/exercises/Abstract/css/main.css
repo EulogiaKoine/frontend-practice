@@ -18,6 +18,7 @@
     padding: 0 2vw;
 
     background-color: black;
+    position: relative;
 }
 .header-container {
     width: 90%; max-width: 1900px;
@@ -99,6 +100,102 @@
 .sign-in:hover {
     background-color: #fff;
     color: #000;
+}
+
+/* ~ ~ ~ header > according to menu(shorten ver) ~ ~ ~ */
+button#search-shorten { transition: transform 0.3s ease-out; }
+button#search-shorten:hover { transform: scale(1.2); }
+button#menu-toggle {
+    margin-left: 15px;
+
+    display: flex;
+    align-items: center;
+}
+.menu-toggle-line {
+    background-color: #fff;
+    width: 23px;
+    height: 2px;
+
+    position: relative;
+
+    transition-duration: 0.3s;
+    transform-origin: center right;
+}
+.menu-toggle-line::before, .menu-toggle-line::after {
+    content: '';
+    display: block;
+    width: inherit; height: inherit;
+    background-color: #fff;
+
+    position: absolute;
+    left: 0;
+    top: 7px;
+
+    transition-duration: 0.3s;
+    transition-timing-function: cubic-bezier(0.5, -0.5, 0.5, 1.5); /* 완전 마음에 들어 */
+    transform-origin: center;
+}
+.menu-toggle-line::after {
+    top: -7px;
+
+    transition-duration: 0.3s;
+}
+/* 메뉴 애니메이션용 */
+.menu-toggle-line.menu-icon-toggle-opened {
+    background-color: transparent;
+    /* transform: rotateY(90deg); */
+}
+.menu-toggle-line.menu-icon-toggle-opened::before {
+    top: 0;
+    transform: rotateZ(45deg);
+}
+.menu-toggle-line.menu-icon-toggle-opened::after {
+    top: 0;
+    transform: rotateZ(-45deg);
+}
+/* 토글로 드러나는 메뉴 */
+.hidden-menu {
+    display: none;
+    position: absolute;
+
+    background-color: #000;
+    top: 88px; left: 0;
+    width: 100%;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+
+    z-index: 4;
+}
+.hidden-menu-container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+.hidden-menu-container > a {
+    display: inline-block;
+    width: 50%;
+    margin: 0 1rem;
+    padding: 1rem 0;
+    background-color: transparent;
+
+    font-size: 24px;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    line-height: 1.5;
+    letter-spacing: 0;
+
+    transition: color 0.3s;
+}
+.hidden-menu-container > a:nth-child(2) {
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+}
+.hidden-menu-container > a:hover {
+    color: rgba(255, 255, 255, 0.7);
 }
 
 
