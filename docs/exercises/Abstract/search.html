@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+
+        <title>FP - Abstract</title>
+        <link rel="icon" type="image/svg+xml" href="svg/reshot-icon-code-CZ2NMXUGQ8.svg">
+
+        <link rel="stylesheet" href="fonts/GT_America_Standard.css/faces.css">
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/base.css">
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/responsive.css">
+        <link rel="stylesheet" href="css/search-main.css">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <!---------------------------------------------------------->
+    <body>
+        <header class="header-outer">
+            <div class="header-container">
+                <div class="logo-wrapper">
+                    <img width="40px" src="svg/reshot-icon-logo-design-7UZWV5ELKT.svg" id="logo">
+                    <h1 class="logo-title">Frontend</h1>
+                    <a class="help-center normal-anchor" href="index.html">Home</a>
+                </div>
+                <div class="menu-wrapper">
+                    <a href="index.html" class="button-nav submit-request">Submit a Request</a>
+                    <a href="index.html" class="button-nav sign-in">Sign in</a>
+                </div>
+<!-- 크기 작을 때 메뉴 토글용 -->
+                <div class="menu-shorten">
+                    <button id="search-shorten">
+                        <svg  xmlns="http://www.w3.org/2000/svg" width="26" height="auto"  
+                            fill="#fff" viewBox="0 0 24 24">
+                            <!--Boxicons v3.0 https://boxicons.com | License  https://docs.boxicons.com/free-->
+                            <path d="m18,10c0-4.41-3.59-8-8-8S2,5.59,2,10s3.59,8,8,8c1.85,0,3.54-.63,4.9-1.69l5.1,5.1,1.41-1.41-5.1-5.1c1.05-1.36,1.69-3.05,1.69-4.9Zm-14,0c0-3.31,2.69-6,6-6s6,2.69,6,6-2.69,6-6,6-6-2.69-6-6Z"
+                                stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"></path>
+                        </svg>
+                    </button>
+                    <button id="menu-toggle">
+                        <span class="menu-toggle-line"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="hidden-menu">
+                <div class="hidden-menu-container">
+                    <a href="">Submit a request</a>
+                    <a href="">Sign in</a>
+                </div>
+            </div>
+            <script>
+                // 메뉴 토글 리스너 등록
+                (function(){
+                    var opened = false;
+                    const button = document.querySelector("#menu-toggle > span.menu-toggle-line")
+                    const hiddenMenu = document.getElementsByClassName("hidden-menu").item(0)
+                    if(button && hiddenMenu)
+                        document.getElementById("menu-toggle").addEventListener('click', () => {
+                            if(opened){
+                                opened = false;
+                                button.classList.remove("menu-icon-toggle-opened")
+                                hiddenMenu.style.display = "none"
+                            } else {
+                                opened = true;
+                                button.classList.add("menu-icon-toggle-opened")
+                                hiddenMenu.style.display = "block"
+                            }
+                        })
+                })()
+            </script>
+        </header>
+
+        <main class="main">
+            <section class="banner">
+                <div class="banner-box">
+                    <p class="search-intro">How can we help?</p>
+                    <div class="search-wrapper">
+                        <form name="search" action="search.html" method="get" autocomplete="off">
+                            <input type="search" name="query" class="search-area" id="searchQuery" placeholder="Search"
+                                autocomplete="off"><!-- 자동완성 끄기 -->
+                        </form>
+                        <svg class="go-search-icon" viewBox="0 0 28 28" transform="" id="injected-svg">
+                            Boxicons v3.0 https://boxicons.com | License  https://docs.boxicons.com/free
+                            <path d="M6 13h8.09l-3.3 3.29 1.42 1.42 5.7-5.71-5.7-5.71-1.42 1.42 3.3 3.29H6z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </section>
+
+            <!-- contents -->
+            <section class="search-results">
+                <section class="search-results-container">
+                    <h3 class="search-results-heading">Search results</h3>
+                    <p id="search-meta">Loading......</p>
+                    <h4 class="search-results-subheading">From Google✨</h4>
+                    <ul class="search-results-view">
+                        <!-- 결과 템플릿 -->
+                        <template id="search-content-template">
+                            <div class="search-content">
+                                <h4 class="search-content-header">
+                                    <a href="" target="_blank" class="normal-anchor">Content Heading</a>
+                                </h4>
+                                <p class="search-content-intro">content introduction <span class="highlighted">keyword</span></p>
+                                <div class="meta-search-info">
+                                    <span>API에서 작성자/작성일</span>&nbsp; · &nbsp;<span>정보를 안 주네요</span>
+                                </div>
+                            </div>
+                        </template>
+                    </ul>
+                </section>
+            </section>
+        </main>
+
+        <!-- footer -->
+        <footer class="footer">
+            <div class="footer-inner-layout">
+                <div class="footer-content">
+                    <h5>Heading</h5>
+                    <a href="index.html" class="normal-anchor">anchor</a>
+                    <a href="index.html" class="normal-anchor">anchor</a>
+                    <a href="index.html" class="normal-anchor">anchor</a>
+                </div>
+                <div class="footer-content">
+                    <h5>Heading</h5>
+                    <a href="index.html" class="normal-anchor">anchor</a>
+                    <a href="index.html" class="normal-anchor">anchor</a>
+                    <a href="index.html" class="normal-anchor">anchor</a>
+                </div>
+                <div class="footer-content">
+                    <h5>Heading</h5>
+                    <a href="index.html" class="normal-anchor">anchor</a>
+                    <a href="index.html" class="normal-anchor">anchor</a>
+                    <a href="index.html" class="normal-anchor">anchor</a>
+                </div>
+                <div class="footer-content">
+                    <h5>Heading</h5>
+                    <a href="index.html" class="normal-anchor">anchor</a>
+                    <a href="index.html" class="normal-anchor">anchor</a>
+                    <a href="index.html" class="normal-anchor">anchor</a>
+                    <h6>Contact-me</h6>
+                    <a href="https://open.kakao.com/o/sa1mmcLb" target="_blank" class="normal-anchor">오픈프로필</a>
+                </div>
+                <div></div>
+                <!-- copyright -->
+                <div class="copyright">
+                    <img class="footer-logo" width="50px" src="svg/reshot-icon-logo-design-7UZWV5ELKT.svg" id="logo">
+                    <p>© Copyright 2025</p>
+                    <p>Clab - frontend study</p>
+                    <p>Nothing reserved</p>
+                </div>
+            </div>
+            <!-- fixed help -->
+            <button class="widget-help">
+                <svg style="display: inline-block;" fill="currentColor" viewBox="0 0 24 24" id="injected-svg">
+                    Boxicons v3.0 https://boxicons.com | License  https://docs.boxicons.com/free
+                    <path d="M11 15H13V17H11z"></path><path d="m9.53,8.03c-.66.66-1.03,1.54-1.03,2.47h2c0-.4.16-.78.44-1.06.57-.57,1.55-.57,2.12,0,.28.28.44.66.44,1.06s-.16.78-.44,1.06-.66.44-1.06.44c-.55,0-1,.45-1,1v1h2v-.14c.55-.16,1.06-.46,1.47-.88.66-.66,1.03-1.54,1.03-2.47s-.36-1.81-1.03-2.47c-1.32-1.32-3.63-1.32-4.95,0Z"></path><path d="m12,2C6.49,2,2,6.49,2,12c0,2.12.68,4.19,1.93,5.9l-1.75,2.53c-.21.31-.24.7-.06,1.03.17.33.51.54.89.54h9c5.51,0,10-4.49,10-10S17.51,2,12,2Zm0,18h-7.09l1.09-1.57c.26-.37.23-.88-.06-1.22-1.25-1.45-1.93-3.3-1.93-5.21,0-4.41,3.59-8,8-8s8,3.59,8,8-3.59,8-8,8Z"></path>
+                </svg>
+                <span>Help</span>
+            </button>
+            </div>
+        </footer>
+
+    
+        <!-- 검색 쿼리에 따른 페이지 생성 -->
+        <script type="text/javascript">
+            console.log("search result loading start...")
+            // template으로 태그 생성
+            function cloneTemplate(templateId){
+                return document.getElementById(templateId)
+                    ?.content?.cloneNode(true)
+            }
+
+            // Google Search JSON API로 검색결과 떼오기
+            // Google Developers API 사용
+            // API를 팀원들이 악용하지 않으리라 믿습니다
+            async function searchGoogle(query){
+                const API_KEY = "AIzaSyCY1dx24g4ZrXdKtD7nrNQ-GymN4_JbrEE" // API키
+                const CSE_ID = "c5b52fa007c6a4eb7" // 커스텀 검색엔진 ID
+                const url = `https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${CSE_ID}&q=${encodeURIComponent(query)}`
+                try {
+                    const res = await fetch(url)
+                    if(!res.ok)
+                        throw new Error('HTTP Error! status: ' + response.status)
+                    return res.json()
+                } catch(e) {
+                    console.error('검색 오류 - ' + e)
+                    return null
+                }
+            }
+            searchGoogle.toString = () => "";
+
+            (async function(){
+                const keyword = new URLSearchParams(window.location.search).get("query")
+                const search_res = await searchGoogle(keyword)
+                console.log(search_res)
+
+                if(search_res === null)
+                    return
+
+                let content, titleAnchor, intro;
+                const results_box = document.querySelector('.search-results-view')
+
+                search_res.items.forEach(item => {
+                    content = cloneTemplate('search-content-template')
+                    // 헤더 및 링크 등록
+                    titleAnchor = content.querySelector('.search-content-header > .normal-anchor')
+                    titleAnchor.textContent = item.title
+                    titleAnchor.href = item.link
+                    // 미리보기 스니펫에서 키워드 토큰 하이라이팅해서 적용
+                    intro = content.querySelector('p.search-content-intro')
+                    if(intro)
+                        intro.innerHTML = item.snippet
+                            .replace(
+                                // 이스케이프 및 양쪽 공백 제거
+                                new RegExp(keyword.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'),
+                                // 일부라도 일치하는 토큰(단어)를 모두 하이라이트, i로 대소문자 무시
+                                match => `<span class="highlighted">${match}</span>`
+                            )
+                    
+                    results_box.appendChild(content)
+                })
+
+                const search_meta = document.getElementById("search-meta")
+                if(search_meta)
+                    search_meta.innerText = `${search_res.items.length} results for "${keyword}"`
+
+                console.log("search results applying done")
+            })()
+        </script>
+    </body>
+</html>

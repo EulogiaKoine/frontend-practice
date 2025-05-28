@@ -1,0 +1,96 @@
+{
+  "kind": "customsearch#search",
+  "url": {
+    "type": "application/json",
+    "template": "..." // OpenSearch 템플릿 URL
+  },
+  "queries": {
+    "request": [
+      {
+        "title": "Search results for ...",
+        "totalResults": "...", // 총 예상 결과 수 (문자열)
+        "searchTerms": "...",   // 검색어
+        "count": 10,             // 현재 페이지의 결과 수
+        "startIndex": 1,         // 현재 페이지의 시작 인덱스
+        "inputEncoding": "utf8",
+        "outputEncoding": "utf8",
+        "safe": "off",
+        "cx": "YOUR_CSE_ID"
+      }
+    ],
+    "nextPage": [ // 다음 페이지가 있을 경우
+      {
+        "title": "Search results for ...",
+        "totalResults": "...",
+        "searchTerms": "...",
+        "count": 10,
+        "startIndex": 11, // 다음 페이지의 시작 인덱스
+        // ... (나머지 속성은 request와 유사)
+      }
+    ],
+    "previousPage": [ // 이전 페이지가 있을 경우
+      {
+        // ... (request와 유사)
+      }
+    ]
+  },
+  "context": {
+    "title": "Your Custom Search Engine Name" // 당신의 검색 엔진 이름
+  },
+  "searchInformation": {
+    "searchTime": 0.2345, // 검색에 걸린 시간 (초)
+    "formattedSearchTime": "0.23 seconds",
+    "totalResults": "123456", // 총 예상 결과 수 (문자열)
+    "formattedTotalResults": "123,456"
+  },
+  "items": [ // 실제 검색 결과 항목들의 배열 (가장 중요!)
+    {
+      "kind": "customsearch#result",
+      "title": "검색 결과 제목 1",
+      "htmlTitle": "<b>검색</b> 결과 <b>제목</b> 1",
+      "link": "https://example.com/page1", // 실제 URL
+      "displayLink": "example.com",
+      "snippet": "이것은 검색 결과 1에 대한 간략한 설명입니다...",
+      "htmlSnippet": "이것은 <b>검색</b> 결과 1에 대한 간략한 설명입니다...",
+      "cacheId": "...",
+      "formattedUrl": "https://example.com/page1",
+      "htmlFormattedUrl": "https://example.com/page1",
+      "pagemap": { // 페이지에 대한 추가 메타데이터 (풍부한 스니펫, 이미지 등)
+        "cse_thumbnail": [
+          {
+            "src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:...",
+            "width": "100",
+            "height": "100"
+          }
+        ],
+        "metatags": [
+          {
+            "og:image": "...",
+            "twitter:card": "summary_large_image",
+            "twitter:title": "...",
+            "og:type": "website",
+            // ... (사이트별 다양한 메타태그)
+          }
+        ],
+        "cse_image": [
+          {
+            "src": "https://example.com/image.jpg"
+          }
+        ]
+      }
+      // ... 기타 속성 (fileFormat, image, labels 등)
+    },
+    {
+      // 두 번째 검색 결과 항목
+      // ...
+    }
+    // ... 최대 10개의 결과가 기본으로 반환됩니다.
+  ],
+  "spelling": { // 철자 보정 (오타가 감지된 경우)
+    "correctedQuery": "정확한 검색어",
+    "htmlCorrectedQuery": "<b>정확한</b> 검색어"
+  },
+  "promotions": [ // 설정에 따라 프로모션 항목이 있을 수 있음
+    // ...
+  ]
+}
