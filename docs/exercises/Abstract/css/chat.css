@@ -1,0 +1,253 @@
+.chat-container {
+    position: fixed;
+    bottom: 0; right: 0;
+    width: 374.4px;
+    height: 572px;
+
+    padding: 1.14286rem;
+    z-index: 20;
+
+    display: none; /* 아래 클래스로 통제 */
+}
+.chat-container-show {
+    display: block;
+    animation: fadein 0.3s;
+}
+@keyframes fadein {
+    from { opacity: 0; } to { opacity: 1; }
+}
+.chat-box {
+    width: 100%; height: 100%;
+    border-radius: 0.571429rem;
+
+    display: flex;
+    flex-direction: column;
+
+    background: #fff;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 0.428571rem 0px;
+
+    overflow: hidden;
+    color: rgb(47, 57, 65);
+}
+
+.chat-header-container {
+    padding: 0.571429rem 1rem;
+    background-color: rgb(76, 95, 213);
+}
+.chat-header {
+    position: relative;
+    /* border-radius: 8px 8px 0 0; */ /* 부모가 chat-box면 overflow:hidden에 의해 빠져나온 부분이 감춰져 자연스레 깎임*/
+    color: #fff;
+}
+.chat-header > h5 {
+    width: 100%;
+    padding: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0px;
+
+    text-align: center;
+}
+.chat-header > #close-chat {
+    position: absolute;
+    display: block;
+    top: 0; right: 0;
+    height: 100%; aspect-ratio: 6/5;
+    border-radius: 3px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: background-color 0.3s;
+}
+.chat-header > #close-chat:hover {
+    background-color: rgb(99, 116, 218);
+}
+.chat-header > #close-chat > span {
+    display: block;
+    width: 30%; height: 0.1em;
+    background-color: #fff;
+}
+
+
+
+.log-area {
+    width: 100%; height: 100%;
+    padding: 15px 15px 0 15px;
+
+    overflow-y: scroll;
+}
+/* 스크롤 스타일링 */
+.log-area::-webkit-scrollbar {
+    width: 14px;
+}
+.log-area::-webkit-scrollbar-thumb {
+    background-color: rgb(216, 220, 222);
+    border-radius: 6px;
+    border: 4px solid white; /* 스크롤 영역 사방에 패딩 주기 꼼수(padding/margin 안 먹힘) */
+}
+.log-area::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0);
+}
+.log-container {
+    overflow: hidden; /* 채팅량이 초과되면 사라지도록 */
+}
+#messages { /* JS로 채팅 올릴 거 */
+    margin-bottom: 5px;
+}
+.bot-logo {
+    display: inline-block;
+    width: 40px;
+    border-radius: 40px;
+}
+.bot-message-container {
+    padding: 0.5rem 0 0 3rem;
+    position: relative;
+}
+.bot-name {
+    margin: 5px 10px 0 10px;
+}
+.bot-name, .bot-name * {
+    font-weight: 200;
+    font-size: 0.9rem;
+}
+.bot-messages {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.bot-message {
+    display: inline-block;
+    margin: 0.1rem 0;
+    padding: 8px 12px;
+    background-color: rgba(200,200,200,0.1);
+    font-weight: 200;
+    font-size: 14px;
+    border-radius: 16px;
+    word-wrap: break-word;
+
+    /* floating */
+    animation-name: floatup;
+    animation-duration: 0.2s;
+    animation-iteration-count: 1;
+}
+.bot-logo-container {
+    position: absolute;
+    /* 채팅 따라 부드럽게 내려가는 애니메이션 - 포기 */
+    /* transition: bottom 0.3s ease-in-out;
+    transition-delay: 0.3s; */
+    bottom: 0; left: 0;
+    animation:floatup 0.3s;
+}
+.user-messages {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+.user-message {
+    display: inline-block;
+    margin: 0.1rem 0;
+    padding: 8px 12px;
+    background-color: rgb(76, 95, 213);
+    font-weight: 200;
+    font-size: 14px;
+    color: #fff;
+    border-radius: 16px;
+    word-wrap: break-word;
+
+    /* floating */
+    animation-name: floatup;
+    animation-duration: 0.2s;
+    animation-iteration-count: 1;
+}
+
+@keyframes floatup {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+}
+
+
+
+.input-area {
+    padding: 1.07143rem 1.42857rem;
+}
+.touch-container {
+    width: 100%;
+    height: 2.28571rem;
+
+    position: relative;
+    line-height: 1;
+}
+#get-touch {
+    /* 버튼 모양 */
+    height: 32px;
+    padding: 8px 14px;
+    background-color: transparent;
+    border: 1px solid rgb(76, 95, 213);
+    border-radius: 16px;
+
+    position: absolute;
+    right: 0;
+
+    font-size: 1rem;
+    font-weight: 300;
+    color: rgb(76, 95, 213);
+
+    white-space: normal;
+
+    transition-property: background-color, color;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-out;
+}
+#get-touch:hover {
+    background-color: rgb(76, 95, 213);
+    color: #fff;
+}
+#question {
+    appearance: none;
+    resize: none; /* textarea 크기 조절 기능 제거 */
+
+    width: 100%;
+    min-height: 40px;
+    margin-top: 18px;
+    padding: 10px 12px;
+    border: 1px solid rgb(216, 220, 222);
+    border-radius: 4px;
+
+    background-color: #fff;
+    
+    vertical-align: center;
+
+    font-family: inherit;
+    font-size: 14px;
+    color: rgb(47, 57, 65);
+    line-height: 1.28571;
+    white-space:pre-wrap; /* pre-wrap 부연
+        1. 연속된 공백 유지 / normal은 하나로 축소
+        2. 줄바꿈 유지
+        3. 자동 줄바꿈 / 그냥 pre와 차이점
+        한마디로 <pre>로 만들기+자동 줄바꿈
+    */
+
+    transition: border-color 0.25s ease-in-out,
+                box-shadow 0.1s ease-in-out,
+                background-color 0.25s ease-in-out,
+                color 0.25s ease-in-out,
+                z-index 0.25s ease-in-out;
+}
+#question::placeholder {
+    color: rgba(0,0,0,0.2);
+}
+#question:hover {
+    border-color: rgb(104, 115, 125);
+}
+#question:focus {
+    box-shadow: rgba(153, 153, 153, 0.4) 0px 0px 0px 3px;
+}

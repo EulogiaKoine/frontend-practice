@@ -374,6 +374,8 @@ button#menu-toggle {
 .widget-help > svg {
     width: 40px;
     fill: #fff;
+
+    transition: all 0.3s ease-in-out;
 }
 .widget-help > span {
     font-size: 20px;
