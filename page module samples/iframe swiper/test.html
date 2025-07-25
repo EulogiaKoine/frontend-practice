@@ -7,14 +7,18 @@
 </head>
 <body>
     <div id="swiper"
-        style="width: 90%; height: 600px; background-color: rgba(199, 199, 199, 0.3); margin: auto;">
-        <div style="width: 300px; height: 200px; text-align: center; background-color: rgba(226, 1, 1, 0.1);"
+        style="width: 90%; height: 600px; background-color: rgba(199, 199, 199, 0.3); margin: auto; overflow: hidden;">
+        <div style="width: 400px; height: 200px; text-align: center; background-color: rgba(226, 1, 1, 0.1);"
             data-is-page>
-            TEST
+            TEST 0
         </div>
-        <div style="width: 300px; height: 200px; text-align: center; background-color: rgba(1, 225, 1, 0.1);"
+        <div style="width: 400px; height: 200px; text-align: center; background-color: rgba(1, 225, 1, 0.1);"
             data-is-page>
-            YEEEEEEEE
+            YEEEEEEEE 1
+        </div>
+        <div style="width: 400px; height: 200px; text-align: center; background-color: rgba(213, 67, 181, 0.1);"
+            data-is-page>
+            YEEEEEEEE 2
         </div>
     </div>
     <script>
@@ -27,32 +31,31 @@
         class Swipeable {
             cont = null // container
             containerWidth = 0
-            highlighted = 0 // 하이라이트된 페이지
+            highlighted = 0 // 하이라이트된 페이지 (실제 페이지 배열 인덱스)
             originX = 0 // 컨테이너 중심 x좌표(width/2, px)
-            // offsetX = 0 // 오른쪽(+)으로 밀린 정도(px)
             startX = 0 // 클릭 시작 X
             pages = []
-            $gap = [200] // px
-            get gap(){ return this.$gap.slice() }
+            $gap = -50 // px
+            get gap(){ return this.$gap }
             set gap(v){
-                if(Array.isArray(v)){
-                    this.$gap = v.filter(gap => typeof gap === 'number')
-                    if(this.$gap.length === 0){
-                        this.$gap = [100]
-                        throw new TypeError("gap(s) must be number[>0]")
-                    }
-                } else if(typeof v === 'number' && v > 0)
-                    this.$gap = [v]
+                if(typeof v === 'number' && v >= 0) // gap은 0 이상
+                    this.$gap = v
                 else
-                    throw new TypeError("gap(s) must be number[>0]")
+                    throw new TypeError("gap must be a number [>=0]")
             }
             // 요소 크기 변경 시 동적으로 조정
             resizer = null
-            animation = true; setAnimation(go){ this.animation = !!go } // 애니메이션 여부
-            targetDX = 0 // [animation] 스와이프 목표 변화값 (전체 스와이프될 거리)
+            animation = false; setAnimation(go){ this.animation = !!go } // 애니메이션 여부
+            targetDX = 0 // [animation] 스와이프 목표 변화값 (currentOffset에 적용될 총 변화량)
             aniReq = null // 애니메이션 request id
-            animationStartTime = 0; // [animation] 애니메이션 시작 시간
+            animationStartTime = 0 // [animation] 애니메이션 시작 시간
             animationDuration = 300 // ms
+
+            currentOffset = 0 // 전체 캐러셀의 현재 translateX 오프셋
+            pageWidths = [] // 각 페이지의 실제 너비
+            totalLoopWidth = 0 // 한 바퀴를 도는 데 필요한 총 너비 (모든 페이지 너비 + 모든 페이지 사이의 간격)
+            _basePageX = [] // currentOffset이 0일 때 각 페이지의 기준 X 좌표 (translateX 값)
+            _animationStartOffset = 0 // 애니메이션 시작 시점의 currentOffset
 
             constructor(element){
                 if(element instanceof HTMLElement)
@@ -63,6 +66,9 @@
             init(cont){
                 this.cont = cont
                 cont.style.position = 'relative'
+                // 컨테이너의 overflow를 hidden으로 설정하여 페이지가 밖으로 나가는 것을 숨김
+                cont.style.overflow = 'hidden'
+
                 this.originX = (
                     this.containerWidth = parseFloat(window.getComputedStyle(cont).width)
                 ) / 2
@@ -71,7 +77,20 @@
                     .forEach(e => {
                         this.initPage(e)
                         this.pages.push(e)
+                        this.pageWidths.push(e.offsetWidth) // 페이지 너비 저장
                     })
+
+                // gap 기본값 설정 (페이지 너비의 1/4)
+                // this.$gap = this.pageWidths.length > 0 ? this.pageWidths[0] / 4 : 0 
+                // 페이지가 2개 미만이면 무한 루프를 적용하지 않음
+                if (this.pages.length < 2) {
+                    this.totalLoopWidth = 0 // 0으로 설정하여 텔레포트가 발생하지 않도록
+                } else {
+                    // totalLoopWidth는 모든 페이지 너비와 모든 페이지 뒤에 오는 간격($gap)의 합
+                    this.totalLoopWidth = this.pages.reduce((sum, page, i) => {
+                        return sum + this.pageWidths[i] + this.$gap
+                    }, 0)
+                }
 
                 this.initPagePositions()
                 this.initSizeObserver()
@@ -88,8 +107,19 @@
                     this.containerWidth = entry.contentRect.width
                     this.originX = this.containerWidth / 2
 
-                    this.initPagePositions()
-                    this.highlighted = this.calculateHighlighted()
+                    // 컨테이너 크기 변경 시 페이지들의 기준 위치 및 총 루프 너비 재계산
+                    this.pageWidths = this.pages.map(e => e.offsetWidth)
+                    // this.$gap = this.pageWidths.length > 0 ? this.pageWidths[0] / 4 : 0
+                    if (this.pages.length >= 2) { // 2개 이상일 때만 다시 계산
+                        this.totalLoopWidth = this.pages.reduce((sum, page, i) => {
+                            return sum + this.pageWidths[i] + this.$gap
+                        }, 0)
+                    } else {
+                        this.totalLoopWidth = 0
+                    }
+
+                    this.initPagePositions() // 기준 위치 재설정
+                    this.snap() // 현재 하이라이트된 페이지로 스냅하여 위치 조정
                 })
 
                 this.resizer.observe(this.cont)
@@ -100,116 +130,193 @@
                 // 좌표 기반 배치가 가능하도록 + 높이는 기본적으로 중간
                 e.style.position = 'absolute'
                 e.style.top = '50%'
-                e.style.transform = "translate(-50%, -50%) translateX(0px)"
+                e.style.transform = "translate(-50%, -50%) translateX(0px)" // 초기 translateX 설정
+            }
 
-                // 중심으로부터의 거리에 따른 불투명도와 스케일
-                // e.style.setAttribute('--distance', '0%')
-                // e.style.opacity = "calc((100% - abs(var(--distance))) / 100%)"
-                // e.style.transform += " scale(calc(100% - abs(var(--distance))))"
-            }
             initPagePositions(){
-                this.pages.forEach((page, i) => this.setPageX(i, this.calculateX(i)))
+                this._basePageX = []
+                let currentX = 0 // 첫 페이지의 X 시작점은 0으로 가정
+
+                for (let i = 0; i < this.pages.length; i++) {
+                    this._basePageX[i] = currentX + this.pageWidths[i] / 2 // 페이지의 중심 X 좌표 저장
+                    currentX += this.pageWidths[i] + this.$gap // 다음 페이지의 시작점 업데이트
+                }
+
+                // 초기 위치 설정 (currentOffset은 0)
+                this.pages.forEach((page, i) => {
+                    this._applyPageTransform(i, this._basePageX[i], this.currentOffset)
+                })
             }
+
             getPagePosition(i){
-                if(i < 0 || this.pages.length < i)
+                if(i < 0 || this.pages.length <= i)
                     throw new Error("페이지 인덱스 이탈")
                 const match = this.pages[i].style.transform.match(/translateX\(([-]?[\d.]+)px\)/)
                 return match? parseFloat(match[1]): 0
             }
             calculateDistanceFromOrigin(i){
-                if(i < 0 || this.pages.length < i)
+                if(i < 0 || this.pages.length <= i)
                     throw new Error("페이지 인덱스 이탈")
+                // getPagePosition은 현재 시각적인 translateX를 반환하므로, 그 값을 사용
                 return Math.abs(this.originX - this.getPagePosition(i))
             }
-            setPageX(i, x){
-                if(i < 0 || this.pages.length < i)
+
+            _applyPageTransform(i, basePageX, currentOffset){
+                if(i < 0 || this.pages.length <= i)
                     throw new Error("페이지 인덱스 이탈")
                 const page = this.pages[i]
-                // page.style.left = x+'px'
-                if(page.style.transform.includes('translateX'))
-                    page.style.transform = page.style.transform.replace(/translateX\(.+\)/, `translateX(${x}px)`)
-                else
-                    page.style.transform += ` translateX(${x}px)`
-                this.styleByDistanceFromOrigin(page, this.calculateDistanceFromOrigin(i))
-            }
-            styleByDistanceFromOrigin(page, distance){
-                // assert page is Page
-                // 불투명도+스케일 조정 적용; 끝에서 완전히 사라지도록
-                const near = (this.originX*1.5 - distance)/this.originX/1.5
-                page.style.opacity = near.toString()
-                if(page.style.transform.includes('scale'))
-                    page.style.transform = page.style.transform.replace(/scale\(.+\)/, `scale(${near*100}%)`)
-                else
-                    page.style.transform += ` scale(${Math.cbrt(near) *100}%)`
-            }
+                const pageHalfWidth = this.pageWidths[i] / 2
 
+                // 기준 X 좌표에 현재 전체 오프셋을 더하여 시각적인 X 좌표 계산
+                // originX를 기준으로 페이지가 중앙에 오도록 오프셋 적용
+                let visualX = (basePageX - this.totalLoopWidth / 2) + currentOffset 
 
-            // 하이라이트(중심) 기준 각 페이지별 핀 좌표(x) 계산
-            calculateX(page){
-                const d_page = page - this.highlighted
-                return this.originX
-                    + this.$gap.slice(0, Math.min(Math.abs(d_page), this.$gap.length))
-                        .reduce((a, v) => a+v, 0) * (d_page > 0? 1: -1)
-            }
-            calculateHighlighted(){
-                let res = 0
-                let distance = this.calculateDistanceFromOrigin(0)
-                for(let i = 1, dx; i < this.pages.length; i++){
-                    dx = this.calculateDistanceFromOrigin(i)
-                    if(dx < distance){
-                        res = i
-                        distance = dx
+                // 텔레포트(순간 이동) 로직: 페이지가 너무 멀리 벗어나면 반대편으로 이동
+                // 페이지의 중심이 originX로부터 totalLoopWidth의 절반 이상 벗어나면 텔레포트
+                if (this.pages.length >= 2 && this.totalLoopWidth > 0) {
+                    // 페이지의 중심이 가상 루프의 왼쪽 끝을 넘어가면 루프 너비만큼 오른쪽으로 이동
+                    while (visualX < this.originX - this.totalLoopWidth / 2 - pageHalfWidth) {
+                        visualX += this.totalLoopWidth
+                    }
+                    // 페이지의 중심이 가상 루프의 오른쪽 끝을 넘어가면 루프 너비만큼 왼쪽으로 이동
+                    while (visualX > this.originX + this.totalLoopWidth / 2 + pageHalfWidth) {
+                        visualX -= this.totalLoopWidth
                     }
                 }
+
+                // transform 속성 업데이트
+                let transformStr = page.style.transform
+                if(transformStr.includes('translateX'))
+                    transformStr = transformStr.replace(/translateX\(.+\)/, `translateX(${visualX}px)`)
+                else
+                    transformStr += ` translateX(${visualX}px)`
+                page.style.transform = transformStr
+
+                // 불투명도 및 스케일 조정 (시각적인 X 좌표 사용)
+                this.styleByDistanceFromOrigin(page, Math.abs(this.originX - visualX))
+            }
+
+            styleByDistanceFromOrigin(page, distance){
+                // 불투명도+스케일 조정 적용; 끝에서 완전히 사라지도록
+                const near = (this.originX*1.5 - distance)/this.originX/1.5
+            
+                let transformStr = page.style.transform
+
+                if(transformStr.includes('scale'))
+                    transformStr = transformStr.replace(/scale\(.+\)/, `scale(${clamp(near, 0, 1)})`)
+                else
+                    transformStr += ` scale(${clamp(near, 0, 1)})`
+                page.style.transform = transformStr
+
+                // z-index 조정: 중심에 가까울수록 높은 z-index 부여
+                // (this.originX * 1.5)는 임의의 최대 거리, 이 값을 기준으로 0~100 사이의 z-index 부여
+                page.style.zIndex = Math.floor(clamp(near, 0, 1) * 100)
+            }
+
+            calculateHighlighted(){
+                let res = 0
+                let minDistance = Infinity // 가장 가까운 페이지를 찾기 위한 최소 거리
+
+                this.pages.forEach((page, i) => {
+                    // 현재 시각적인 페이지의 X 좌표를 기준으로 중심과의 거리 계산
+                    const currentVisualX = this.getPagePosition(i)
+                    const distance = Math.abs(this.originX - currentVisualX)
+
+                    if(distance < minDistance){
+                        minDistance = distance
+                        res = i // 실제 페이지 배열 인덱스 저장
+                    }
+                })
                 return res
             }
 
-            // 시작-끝-시작이 부드럽게 이어지도록 ease-in-out식
             easeInOutQuad(t) {
-                return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+                return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
             }
 
-            // 모든 일괄 이동 시 애니메이션 처리 관장(개별 페이지 애니메이션 처리는 부하 때문에 패스)
-            swipe(dx){
-                // 애니메이션 모드
+            swipe(dx){ // dx는 전체 캐러셀이 이동할 총 변화량
                 if(this.animation){
-                    // 이미 진행 중인 애니메이션이 있다면 취소
+                    // 이미 애니메이션이 진행 중이면 취소
                     if(this.aniReq)
                         cancelAnimationFrame(this.aniReq)
 
-                    this.targetDX = dx // 목표로 할 총 이동 거리 저장
+                    this.targetDX = dx // 애니메이션 목표 변화량 저장
                     this.animationStartTime = performance.now() // 애니메이션 시작 시간 기록
 
-                    // 각 페이지의 현재 위치를 애니메이션 시작점으로 저장
-                    // 애니메이션 시작 시점에 이미 translateX가 적용되어 있으므로 그 값을 가져옴
-                    this.initialPagePositions = this.pages
-                        .map(page => this.getPagePosition(this.pages.indexOf(page)))
+                    // 애니메이션 시작 시점의 currentOffset을 저장 (시작점)
+                    this._animationStartOffset = this.currentOffset
 
-                    this.aniReq = requestAnimationFrame(this.traceAnimation); // 애니메이션 시작
+                    this.aniReq = requestAnimationFrame(this.traceAnimation) // 애니메이션 시작
                 } else {
-                    // 비 애니메이션 모드
+                    // 애니메이션 비활성화 시 즉시 이동: currentOffset에 dx를 바로 적용
+                    this.currentOffset += dx
                     this.pages.forEach((page, i) => {
-                        this.setPageX(i, this.getPagePosition(i) + dx)
+                        // 각 페이지의 기준 X 좌표에 새로운 currentOffset을 적용하여 위치 업데이트
+                        this._applyPageTransform(i, this._basePageX[i], this.currentOffset)
                     })
                 }
             }
-
             setHighlighted(idx){
-                if(idx < 0 || this.pages.length <= idx) // 인덱스 범위 오류 수정: <=
-                    throw new RangeError(`없는 페이지 ${idx}`);
+                // idx는 실제 페이지 배열 인덱스 (0 ~ pages.length - 1)
+                if(idx < 0 || idx >= this.pages.length) // 인덱스 범위 확인
+                    throw new RangeError(`없는 페이지 ${idx}`)
 
-                // 목표 하이라이트 페이지를 중앙(originX)으로 이동시키기 위한 dx 계산
-                const currentHighlightedPageX = this.getPagePosition(idx); // 현재 이 페이지의 translateX 값
-                const dxToCenter = this.originX - currentHighlightedPageX; // 중심까지 이동해야 할 거리
+                // 목표 페이지의 기준 X 좌표
+                const targetBaseX = this._basePageX[idx]
+                // 목표 페이지가 컨테이너 중앙(originX)에 오도록 하기 위한 새로운 currentOffset 값
+                const newTargetOffset = this.originX - (targetBaseX - this.totalLoopWidth / 2) // totalLoopWidth / 2 보정
 
-                this.swipe(dxToCenter); // 계산된 dx를 swipe 메서드에 전달
-                this.highlighted = idx;
+                // 무한 루프를 위한 최단 거리 이동 계산
+                if (this.pages.length >= 2 && this.totalLoopWidth > 0) {
+                    let diff = newTargetOffset - this.currentOffset
+                    // diff를 totalLoopWidth의 절반 범위 내로 조정하여 최단 경로를 찾음
+                    // (diff + totalLoopWidth / 2) % totalLoopWidth - totalLoopWidth / 2
+                    // 최단거리 공식
+                    diff = ((diff % this.totalLoopWidth) + this.totalLoopWidth) % this.totalLoopWidth
+                    if (diff > this.totalLoopWidth / 2) {
+                        diff -= this.totalLoopWidth
+                    }
+                    this.swipe(diff) // 계산된 최단 거리 dx로 swipe 호출
+                } else {
+                    this.swipe(newTargetOffset - this.currentOffset) // 페이지가 1개일 경우 일반적인 이동
+                }
+
+                this.highlighted = idx // 하이라이트된 페이지 인덱스 업데이트
             }
+
             swipePage(di){
-                if(di === 0) return
-                // todo: repeatable
-                this.setHighlighted(clamp(this.highlighted + di, 0, this.pages.length-1))
+                if(di === 0) return // 이동할 필요가 없으면 바로 종료
+
+                // 현재 하이라이트된 페이지와 목표 페이지의 인덱스를 계산합니다.
+                let nextHighlighted = (this.highlighted + di) % this.pages.length
+                if (nextHighlighted < 0) {
+                    nextHighlighted += this.pages.length // 음수 인덱스 보정
+                }
+
+                // 목표 페이지의 기준 X 좌표 (currentOffset이 0일 때의 위치)
+                const targetBaseX = this._basePageX[nextHighlighted]
+
+                // 목표 페이지가 컨테이너 중앙(originX)에 오도록 하기 위한 '이상적인' currentOffset 값
+                const idealTargetOffset = this.originX - (targetBaseX - this.totalLoopWidth / 2) // totalLoopWidth / 2 보정
+
+                // 현재 currentOffset과 이상적인 목표 currentOffset 사이의 차이를 계산합니다.
+                let dx = idealTargetOffset - this.currentOffset
+
+                // 무한 루프 캐러셀에서 가장 짧은 경로로 이동하기 위한 delta X (dx)를 조정
+                // dx를 totalLoopWidth의 절반 범위 내 최단 경로
+                if (this.pages.length >= 2 && this.totalLoopWidth > 0) {
+                    // dx가 totalLoopWidth의 절반을 초과하면 totalLoopWidth를 빼서 반대 방향으로 이동 (최단 경로)
+                    if (dx > this.totalLoopWidth / 2) 
+                        dx -= this.totalLoopWidth
+                    // dx가 -totalLoopWidth의 절반 미만이면 totalLoopWidth를 더해서 반대 방향으로 이동 (최단 경로)
+                    else if (dx < -this.totalLoopWidth / 2)
+                        dx += this.totalLoopWidth
+                }
+                
+                this.swipe(dx)
+                this.highlighted = nextHighlighted
             }
+
             snap(){
                 this.setHighlighted(this.calculateHighlighted())
             }
@@ -217,64 +324,76 @@
 
             // 마우스 조작
             handleMouseDown = e => { // 컨테이너 위 클릭
-                // 마우스 드래그 시작 시 애니메이션 중단
+                // 페이지 상호작용 차단
+                this.pages.forEach(p => p.style.pointerEvents = 'none')
+                // 마우스 드래그 시작 시 진행 중인 애니메이션이 있다면 취소
                 if (this.aniReq) {
-                    cancelAnimationFrame(this.aniReq);
+                    cancelAnimationFrame(this.aniReq)
                     this.aniReq = null
                 }
                 this.startX = e.clientX
                 document.body.addEventListener('mousemove', this.handleMouseMove)
                 document.body.addEventListener('mouseup', this.handleMouseUp)
             }
+
             handleMouseMove = e => {
-                // 드래그 중에는 애니메이션을 끄고 직접 위치 업데이트
-                // this.animation 플래그를 여기서 false로 설정하거나,
-                // handleMouseMove가 animation=false일 때만 호출되도록 로직 조정 필요
-                // 현재 코드에서는 이 조건이 필요 없음: 이미 swipe에서 animation 플래그를 처리함
-                // 하지만 드래그 중에는 애니메이션이 아닌 즉각적인 이동이므로, animation=false인 것처럼 동작
+                // 마우스 드래그 중에는 애니메이션 없이 즉시 위치 업데이트
+                const deltaX = e.clientX - this.startX
+                this.currentOffset += deltaX // 전체 오프셋 업데이트
                 this.pages.forEach((page, i) => {
-                    this.setPageX(i, this.getPagePosition(i) + (e.clientX - this.startX))
+                    // 각 페이지의 기준 X 좌표에 새로운 currentOffset을 적용하여 위치 업데이트
+                    this._applyPageTransform(i, this._basePageX[i], this.currentOffset)
                 })
                 this.startX = e.clientX
             }
+
             handleMouseUp = e => {
                 document.body.removeEventListener('mousemove', this.handleMouseMove)
                 document.body.removeEventListener('mouseup', this.handleMouseUp)
-                // 마우스 드래그가 끝나면 스냅 애니메이션 시작 (animation 플래그에 따라 동작)
-                this.snap()
+                this.snap() // 드래그 종료 후 가장 가까운 페이지로 스냅 (애니메이션 적용)
+                // 페이지 상호작용 해제
+                this.pages.forEach(p => p.style.pointerEvents = '')
             }
 
-            // 애니메이션
             traceAnimation = timeStamp => {
                 const elapsed = timeStamp - this.animationStartTime
                 let progress = elapsed / this.animationDuration
 
-                // 애니메이션이 끝나면 최종 위치로 설정하고 종료
                 if (progress >= 1) {
-                    this.pages.forEach((page, i) => {
-                        this.setPageX(i, this.initialPagePositions[i] + this.targetDX);
-                    })
+                    // 애니메이션 종료: 최종 목표 오프셋을 currentOffset에 적용
+                    this.currentOffset = this._animationStartOffset + this.targetDX
+                    this.targetDX = 0 // 목표 변화량 초기화
                     cancelAnimationFrame(this.aniReq)
                     this.aniReq = null
-                    this.targetDX = 0 // 목표 변화량 초기화
+
+                    // 모든 페이지의 최종 위치를 확정하고 텔레포트 로직을 다시 적용
+                    this.pages.forEach((page, i) => {
+                        this._applyPageTransform(i, this._basePageX[i], this.currentOffset)
+                    })
+
+                    this.snap() // 애니메이션 종료 후 가장 가까운 페이지로 스냅
                     return
                 }
 
-                const easedProgress = this.easeInOutQuad(progress)
+                // 현재 프레임의 전체 오프셋
+                // (시작 위치) + (이동할 거리)*(진행 비율 -> ease-in-out 필터)
+                const animatedCurrentOffset = this._animationStartOffset
+                    + this.targetDX * this.easeInOutQuad(progress)
 
-                // 현재 프레임에서 각 페이지의 위치 계산 및 업데이트
+                // 모든 페이지의 위치를 현재 애니메이션 오프셋에 따라 업데이트
                 this.pages.forEach((page, i) => {
-                    const currentDX = this.targetDX * easedProgress;
-                    this.setPageX(i, this.initialPagePositions[i] + currentDX);
+                    this._applyPageTransform(i, this._basePageX[i], animatedCurrentOffset)
                 })
 
                 this.aniReq = requestAnimationFrame(this.traceAnimation)
             }
+            // ---------------------------------------------
         }
 
 
         var swiper = new Swipeable(document.getElementById('swiper'))
         // 테스트를 위해 애니메이션 활성화
+        swiper.setAnimation(true)
     </script>
 </body>
 </html>
