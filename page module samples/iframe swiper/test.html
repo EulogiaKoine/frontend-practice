@@ -30,9 +30,7 @@
             highlighted = 0 // 하이라이트된 페이지
             originX = 0 // 컨테이너 중심 x좌표(width/2, px)
             // offsetX = 0 // 오른쪽(+)으로 밀린 정도(px)
-            animation = false; setAnimation(go){ this.animation = !!go } // 애니메이션 여부
-            startX = 0 // 애니메이션용 - 클릭 시작 X
-            targetX = 0 // 애니메이션용 - 클릭 끝 X
+            startX = 0 // 클릭 시작 X
             pages = []
             $gap = [200] // px
             get gap(){ return this.$gap.slice() }
@@ -50,6 +48,11 @@
             }
             // 요소 크기 변경 시 동적으로 조정
             resizer = null
+            animation = true; setAnimation(go){ this.animation = !!go } // 애니메이션 여부
+            targetDX = 0 // [animation] 스와이프 목표 변화값 (전체 스와이프될 거리)
+            aniReq = null // 애니메이션 request id
+            animationStartTime = 0; // [animation] 애니메이션 시작 시간
+            animationDuration = 300 // ms
 
             constructor(element){
                 if(element instanceof HTMLElement)
@@ -160,24 +163,47 @@
                 }
                 return res
             }
+
+            // 시작-끝-시작이 부드럽게 이어지도록 ease-in-out식
+            easeInOutQuad(t) {
+                return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+            }
+
             // 모든 일괄 이동 시 애니메이션 처리 관장(개별 페이지 애니메이션 처리는 부하 때문에 패스)
             swipe(dx){
+                // 애니메이션 모드
                 if(this.animation){
-                    // todo
+                    // 이미 진행 중인 애니메이션이 있다면 취소
+                    if(this.aniReq)
+                        cancelAnimationFrame(this.aniReq)
+
+                    this.targetDX = dx // 목표로 할 총 이동 거리 저장
+                    this.animationStartTime = performance.now() // 애니메이션 시작 시간 기록
+
+                    // 각 페이지의 현재 위치를 애니메이션 시작점으로 저장
+                    // 애니메이션 시작 시점에 이미 translateX가 적용되어 있으므로 그 값을 가져옴
+                    this.initialPagePositions = this.pages
+                        .map(page => this.getPagePosition(this.pages.indexOf(page)))
+
+                    this.aniReq = requestAnimationFrame(this.traceAnimation); // 애니메이션 시작
+                } else {
+                    // 비 애니메이션 모드
+                    this.pages.forEach((page, i) => {
+                        this.setPageX(i, this.getPagePosition(i) + dx)
+                    })
                 }
-
-
-                // this.offsetX += dx
-                this.pages.forEach((page, i) => {
-                    this.setPageX(i, this.getPagePosition(i) + dx)
-                })
             }
 
             setHighlighted(idx){
-                if(idx < 0 || this.pages.length < idx)
-                    throw new RangeError(`없는 페이지 ${i}`)
-                this.swipe(this.originX - getPagePosition(idx))
-                this.highlighted = idx
+                if(idx < 0 || this.pages.length <= idx) // 인덱스 범위 오류 수정: <=
+                    throw new RangeError(`없는 페이지 ${idx}`);
+
+                // 목표 하이라이트 페이지를 중앙(originX)으로 이동시키기 위한 dx 계산
+                const currentHighlightedPageX = this.getPagePosition(idx); // 현재 이 페이지의 translateX 값
+                const dxToCenter = this.originX - currentHighlightedPageX; // 중심까지 이동해야 할 거리
+
+                this.swipe(dxToCenter); // 계산된 dx를 swipe 메서드에 전달
+                this.highlighted = idx;
             }
             swipePage(di){
                 if(di === 0) return
@@ -191,27 +217,64 @@
 
             // 마우스 조작
             handleMouseDown = e => { // 컨테이너 위 클릭
+                // 마우스 드래그 시작 시 애니메이션 중단
+                if (this.aniReq) {
+                    cancelAnimationFrame(this.aniReq);
+                    this.aniReq = null
+                }
                 this.startX = e.clientX
                 document.body.addEventListener('mousemove', this.handleMouseMove)
                 document.body.addEventListener('mouseup', this.handleMouseUp)
             }
             handleMouseMove = e => {
-                if(this.animation){
-                    // 미구현
-                    return
-                }
-
-                this.swipe(e.clientX - this.startX)
+                // 드래그 중에는 애니메이션을 끄고 직접 위치 업데이트
+                // this.animation 플래그를 여기서 false로 설정하거나,
+                // handleMouseMove가 animation=false일 때만 호출되도록 로직 조정 필요
+                // 현재 코드에서는 이 조건이 필요 없음: 이미 swipe에서 animation 플래그를 처리함
+                // 하지만 드래그 중에는 애니메이션이 아닌 즉각적인 이동이므로, animation=false인 것처럼 동작
+                this.pages.forEach((page, i) => {
+                    this.setPageX(i, this.getPagePosition(i) + (e.clientX - this.startX))
+                })
                 this.startX = e.clientX
             }
             handleMouseUp = e => {
                 document.body.removeEventListener('mousemove', this.handleMouseMove)
                 document.body.removeEventListener('mouseup', this.handleMouseUp)
+                // 마우스 드래그가 끝나면 스냅 애니메이션 시작 (animation 플래그에 따라 동작)
+                this.snap()
+            }
+
+            // 애니메이션
+            traceAnimation = timeStamp => {
+                const elapsed = timeStamp - this.animationStartTime
+                let progress = elapsed / this.animationDuration
+
+                // 애니메이션이 끝나면 최종 위치로 설정하고 종료
+                if (progress >= 1) {
+                    this.pages.forEach((page, i) => {
+                        this.setPageX(i, this.initialPagePositions[i] + this.targetDX);
+                    })
+                    cancelAnimationFrame(this.aniReq)
+                    this.aniReq = null
+                    this.targetDX = 0 // 목표 변화량 초기화
+                    return
+                }
+
+                const easedProgress = this.easeInOutQuad(progress)
+
+                // 현재 프레임에서 각 페이지의 위치 계산 및 업데이트
+                this.pages.forEach((page, i) => {
+                    const currentDX = this.targetDX * easedProgress;
+                    this.setPageX(i, this.initialPagePositions[i] + currentDX);
+                })
+
+                this.aniReq = requestAnimationFrame(this.traceAnimation)
             }
         }
 
 
         var swiper = new Swipeable(document.getElementById('swiper'))
+        // 테스트를 위해 애니메이션 활성화
     </script>
 </body>
 </html>
