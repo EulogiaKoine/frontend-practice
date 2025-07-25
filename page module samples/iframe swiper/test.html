@@ -30,7 +30,7 @@
             highlighted = 0 // 하이라이트된 페이지
             originX = 0 // 컨테이너 중심 x좌표(width/2, px)
             // offsetX = 0 // 오른쪽(+)으로 밀린 정도(px)
-            animation = true; setAnimation(go){ this.animation = !!go } // 애니메이션 여부
+            animation = false; setAnimation(go){ this.animation = !!go } // 애니메이션 여부
             startX = 0 // 애니메이션용 - 클릭 시작 X
             targetX = 0 // 애니메이션용 - 클릭 끝 X
             pages = []
@@ -72,6 +72,9 @@
 
                 this.initPagePositions()
                 this.initSizeObserver()
+
+                // 마우스 조작
+                this.cont.addEventListener('mousedown', this.handleMouseDown)
             }
             initSizeObserver(){
                 if(this.resizer !== null)
@@ -94,7 +97,7 @@
                 // 좌표 기반 배치가 가능하도록 + 높이는 기본적으로 중간
                 e.style.position = 'absolute'
                 e.style.top = '50%'
-                e.style.transform = "translate(-50%, -50%)"
+                e.style.transform = "translate(-50%, -50%) translateX(0px)"
 
                 // 중심으로부터의 거리에 따른 불투명도와 스케일
                 // e.style.setAttribute('--distance', '0%')
@@ -107,7 +110,8 @@
             getPagePosition(i){
                 if(i < 0 || this.pages.length < i)
                     throw new Error("페이지 인덱스 이탈")
-                return parseFloat(this.pages[i].style.left)
+                const match = this.pages[i].style.transform.match(/translateX\(([-]?[\d.]+)px\)/)
+                return match? parseFloat(match[1]): 0
             }
             calculateDistanceFromOrigin(i){
                 if(i < 0 || this.pages.length < i)
@@ -118,7 +122,11 @@
                 if(i < 0 || this.pages.length < i)
                     throw new Error("페이지 인덱스 이탈")
                 const page = this.pages[i]
-                page.style.left = x+'px'
+                // page.style.left = x+'px'
+                if(page.style.transform.includes('translateX'))
+                    page.style.transform = page.style.transform.replace(/translateX\(.+\)/, `translateX(${x}px)`)
+                else
+                    page.style.transform += ` translateX(${x}px)`
                 this.styleByDistanceFromOrigin(page, this.calculateDistanceFromOrigin(i))
             }
             styleByDistanceFromOrigin(page, distance){
@@ -141,11 +149,10 @@
                         .reduce((a, v) => a+v, 0) * (d_page > 0? 1: -1)
             }
             calculateHighlighted(){
-                const calculateDistance = page => Math.abs(this.originX - parseFloat(page.style.left))
                 let res = 0
-                let distance = calculateDistance(this.pages[0])
+                let distance = this.calculateDistanceFromOrigin(0)
                 for(let i = 1, dx; i < this.pages.length; i++){
-                    dx = calculateDistance(this.pages[i])
+                    dx = this.calculateDistanceFromOrigin(i)
                     if(dx < distance){
                         res = i
                         distance = dx
@@ -162,14 +169,14 @@
 
                 // this.offsetX += dx
                 this.pages.forEach((page, i) => {
-                    this.setPageX(i, parseFloat(page.style.left) + dx)
+                    this.setPageX(i, this.getPagePosition(i) + dx)
                 })
             }
 
             setHighlighted(idx){
                 if(idx < 0 || this.pages.length < idx)
                     throw new RangeError(`없는 페이지 ${i}`)
-                this.swipe(this.originX - parseFloat(this.pages[idx].style.left))
+                this.swipe(this.originX - getPagePosition(idx))
                 this.highlighted = idx
             }
             swipePage(di){
@@ -185,8 +192,21 @@
             // 마우스 조작
             handleMouseDown = e => { // 컨테이너 위 클릭
                 this.startX = e.clientX
-                document.body.addEventListener(this.handleMouseMove)
-                document.body.addEventListener(this.handleMouseUp)
+                document.body.addEventListener('mousemove', this.handleMouseMove)
+                document.body.addEventListener('mouseup', this.handleMouseUp)
+            }
+            handleMouseMove = e => {
+                if(this.animation){
+                    // 미구현
+                    return
+                }
+
+                this.swipe(e.clientX - this.startX)
+                this.startX = e.clientX
+            }
+            handleMouseUp = e => {
+                document.body.removeEventListener('mousemove', this.handleMouseMove)
+                document.body.removeEventListener('mouseup', this.handleMouseUp)
             }
         }
 
