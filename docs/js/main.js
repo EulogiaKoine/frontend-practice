@@ -16,6 +16,7 @@ function createScaledIframeThumbnail(src, width, height, scale, asAnchor){
     iframe.height = height
     iframe.style.backgroundColor = 'rgb(255,255,255)'
     iframe.style.setProperty('pointer-events', 'none', 'important')
+    iframe.style.border = "none"
 
     iframe.onload = () => {
         try{ 
@@ -37,6 +38,9 @@ function createScaledIframeThumbnail(src, width, height, scale, asAnchor){
         const a = document.createElement('a')
         a.href = src
         a.target = "_blank"
+
+        a.style.display = "block"
+        a.style.backgroundColor = "white"
         a.appendChild(iframe)
         return a
     }
@@ -48,7 +52,7 @@ function createScaledIframeThumbnail(src, width, height, scale, asAnchor){
 const pageContainer = document.getElementById('swiper-test')
 const pageSamples = ['exercises/Abstract/index.html', 'exercises/Ableton/index.html']
 for(let src of pageSamples){
-    let iframe = createScaledIframeThumbnail(src, 1200, 400, 1/3, true)
+    let iframe = createScaledIframeThumbnail(src, 1200, 500, 2/5, true)
     iframe.setAttribute('data-is-page', '')
 
     // url로 이어지는 앵커 추가
