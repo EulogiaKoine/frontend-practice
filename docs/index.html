@@ -9,6 +9,9 @@
         <link rel="stylesheet" href="css/yeah.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <script type="module" src="js/main.js">
+            globalThis.swiper = swiper
+        </script>
         <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
         <style>
             :root {
@@ -48,44 +51,16 @@
             <p>2025년 Clab 프론트엔드 스터디</p>
             <p>참여자 오경석의 연습용 페이지 모음입니다.</p>
             <hr>
-            <div class="responsive-grid">
-                <div class="border-box shadow-box" style="box-sizing: content-box; padding: 1em;">
-                    <a href="exercises/Ableton/index.html" style="font-size: 1em;" target="_blank">🔗</a>
-                    <h4 style="display: inline; padding: 5px;" id="Ableton-Review">Ableton</h4>
-                    <p style="font-family: Arial, Helvetica, sans-serif; display: none;">
-                        2025. 4. 11 ~ 2025. 5. 9
-                    </p>
+            <div id="swiper-test" style="width: 90%; height: 80vh; margin: auto; background-color: lightgray;">
+                <div style="width: 400px; height: 500px; background-color: blue;" data-is-page>
+                    test
                 </div>
-                <script>
-                    const ableton_title = document.getElementById("Ableton-Review")
-                    ableton_title.addEventListener("click", e => {
-                        if(window.getComputedStyle(ableton_title.nextElementSibling).display === "none")
-                            ableton_title.nextElementSibling.style.display = "block";
-                        else
-                            ableton_title.nextElementSibling.style.display = "none";
-                    })
-                </script>
-
-                <div class="border-box shadow-box" style="box-sizing: content-box; padding: 1em;">
-                    <a href="exercises/Abstract/index.html" style="font-size: 1em;" target="_blank">🔗</a>
-                    <h4 style="display: inline; padding: 5px;" id="Abstract-Review">Abstract</h4>
-                    <p style="font-family: Arial, Helvetica, sans-serif; display: none;">
-                        2025. 5. 11 ~ 5. 17 (total 7.5 hours)
-                    </p>
+                <div style="width: 400px; height: 500px; background-color: gold;" data-is-page>
+                    test22
                 </div>
-                <script>
-                    const abstract_title = document.getElementById("Abstract-Review")
-                    abstract_title.addEventListener("click", e => {
-                        if(window.getComputedStyle(abstract_title.nextElementSibling).display === "none")
-                            abstract_title.nextElementSibling.style.display = "block";
-                        else
-                            abstract_title.nextElementSibling.style.display = "none";
-                    })
-                </script>
-            </div>
-            <div style="pointer-events:none; overflow: hidden;">
-                <iframe src="https://suuuunng.github.io/front-practice/" frameborder="0"
-                style="width: 90vw; height: 80vh; overflow: hidden;"></iframe>
+                <div style="width: 10vw; background-color: white;">
+                    not page
+                </div>
             </div>
         </main>
     </body>
