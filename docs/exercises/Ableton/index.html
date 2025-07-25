@@ -46,7 +46,7 @@
                 const nav = document.getElementById("fade-out-sample")
                 let scrollThreshold = 0;
                 window.addEventListener('load', () => {
-                    scrollThreshold = docuemnt.getElementById("menu").offsetHeight ?? 0
+                    scrollThreshold = document.getElementById("menu").offsetHeight ?? 0
                 }, {once: true})
                 window.addEventListener('scroll', () => {
                     if(window.scrollY > scrollThreshold) nav.classList.add('fade-out')

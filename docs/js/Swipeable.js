@@ -51,6 +51,9 @@ export default class Swipeable {
     _basePageX = []
     _animationStartOffset = 0
 
+    mouseMoveAniReq = null
+    lastMouseX = 0
+
     constructor(element){
         if(element instanceof HTMLElement)
             this.init(element)
@@ -181,7 +184,7 @@ export default class Swipeable {
         let transformStr = page.style.transform
 
         if(transformStr.includes('scale'))
-            transformStr = transformStr.replace(/scale\(.+\)/, `scale(${clamp(near, 0, 1)})`)
+            transformStr = transformStr.replace(/scale\(.+\)/, `scale(${clamp(Math.log(near+1), 0.3, 1)})`)
         else
             transformStr += ` scale(${clamp(near, 0, 1)})`
         page.style.transform = transformStr
@@ -275,30 +278,53 @@ export default class Swipeable {
     }
 
     handleMouseDown = e => {
-        this.pages.forEach(p => p.style.pointerEvents = 'none')
+        if (e.target.closest('a'))
+            return
+
+        e.preventDefault()
+
+        // 2. 현재 실행 중인 애니메이션이 있다면 취소합니다.
         if (this.aniReq) {
             cancelAnimationFrame(this.aniReq)
             this.aniReq = null
         }
+        
+        // 3. 드래그 시작 지점과 이벤트 리스너 설정
         this.startX = e.clientX
-        document.body.addEventListener('mousemove', this.handleMouseMove)
-        document.body.addEventListener('mouseup', this.handleMouseUp)
+        this.lastMouseX = e.clientX // handleMouseMove의 delta 계산을 위한 초기 설정
+
+        document.body.addEventListener('mousemove', this.handleMouseMove);
+        document.body.addEventListener('mouseup', this.handleMouseUp);
     }
 
     handleMouseMove = e => {
-        const deltaX = e.clientX - this.startX
-        this.currentOffset += deltaX
-        this.pages.forEach((page, i) => {
-            this._applyPageTransform(i, this._basePageX[i], this.currentOffset)
-        })
-        this.startX = e.clientX
+        // 최적화 -> requestAnimation으로 묶어서 부하 감소
+        if (this.mouseMoveAniReq === null) {
+            this.mouseMoveAniReq = requestAnimationFrame(() => {
+                const deltaX = e.clientX - this.lastMouseX
+                this.currentOffset += deltaX
+                this.lastMouseX = e.clientX // 다음 delta 계산을 위해 현재 위치를 저장
+
+                this.pages.forEach((page, i) => {
+                    this._applyPageTransform(i, this._basePageX[i], this.currentOffset)
+                })
+                this.mouseMoveAniReq = null // 다음 requestAnimationFrame 호출을 위해 null로 초기화
+            })
+        }
     }
 
     handleMouseUp = e => {
         document.body.removeEventListener('mousemove', this.handleMouseMove)
         document.body.removeEventListener('mouseup', this.handleMouseUp)
+
+        if (this.mouseMoveAniReq) {
+            cancelAnimationFrame(this.mouseMoveAniReq)
+            this.mouseMoveAniReq = null
+        }
+
         this.snap()
-        this.pages.forEach(p => p.style.pointerEvents = '')
+
+        // this.pages.forEach(p => p.style.pointerEvents = '')
     }
 
     traceAnimation = timeStamp => {
