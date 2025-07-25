@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Horizontal Slider</title>
+    <link rel="stylesheet" href="HorizontalSlider.css">
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .my-slider-wrapper {
+            width: 80%;
+            max-width: 800px;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            position: relative; /* 버튼 배치를 위해 */
+        }
+
+        /* 각 슬라이드 아이템의 내용 스타일링 */
+        .horizontal-slider-item {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px; /* 슬라이더 높이 */
+            font-size: 2em;
+            color: white;
+        }
+
+        .horizontal-slider-item:nth-child(1) { background-color: #ff6347; } /* Tomato */
+        .horizontal-slider-item:nth-child(2) { background-color: #4682b4; } /* SteelBlue */
+        .horizontal-slider-item:nth-child(3) { background-color: #3cb371; } /* MediumSeaGreen */
+        .horizontal-slider-item:nth-child(4) { background-color: #ffd700; } /* Gold */
+
+        .slider-controls {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+            pointer-events: none; /* 버튼이 슬라이더 드래그를 방해하지 않도록 */
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        .slider-controls button {
+            pointer-events: auto; /* 버튼 자체는 클릭 가능하게 */
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1.2em;
+        }
+
+        .slider-indicator {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1.1em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="my-slider-wrapper">
+        <div id="mySlider">
+            <div class="slide">Slide 1</div>
+            <div class="slide">Slide 2</div>
+            <div class="slide">Slide 3</div>
+            <div class="slide">Slide 4</div>
+        </div>
+        <div class="slider-controls">
+            <button id="prevBtn">&lt;</button>
+            <button id="nextBtn">&gt;</button>
+        </div>
+    </div>
+    <div class="slider-indicator">Current Step: <span id="currentStepDisplay">0</span> (Percentage: <span id="percentageDisplay">0</span>%)</div>
+
+    <script src="HorizontalSlider.js"></script> <script>
+        const sliderElement = document.getElementById('mySlider');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const currentStepDisplay = document.getElementById('currentStepDisplay');
+        const percentageDisplay = document.getElementById('percentageDisplay');
+
+        // 슬라이더 아이템에 'horizontal-slider-item' 클래스 추가 (JS에서 처리)
+        // 이 부분은 실제 프로젝트에서는 HTML 템플릿 엔진이나 다른 방식으로 처리될 수 있습니다.
+        Array.from(sliderElement.children).forEach(child => {
+            child.classList.add('horizontal-slider-item');
+        });
+
+        const mySlider = new HorizontalSlider(sliderElement, {
+            totalSteps: sliderElement.children.length,
+            initialStep: 0,
+        });
+
+        mySlider.on('change', (currentStep, percentage) => {
+            console.log(`Change: Step ${currentStep}, Percentage ${percentage.toFixed(2)}%`);
+            currentStepDisplay.textContent = currentStep.toString();
+            percentageDisplay.textContent = percentage.toFixed(2);
+        });
+
+        mySlider.on('slideStart', (currentStep, percentage) => {
+            console.log(`Slide Start: Step ${currentStep}, Percentage ${percentage.toFixed(2)}%`);
+            // 드래그 시작 시 로딩 인디케이터 표시 등
+        });
+
+        mySlider.on('slideEnd', (currentStep, percentage) => {
+            console.log(`Slide End: Step ${currentStep}, Percentage ${percentage.toFixed(2)}%`);
+            // 드래그 종료 시 로딩 인디케이터 숨기기 등
+        });
+
+        prevBtn.addEventListener('click', () => mySlider.prev());
+        nextBtn.addEventListener('click', () => mySlider.next());
+
+        // 초기 디스플레이 업데이트
+        currentStepDisplay.textContent = mySlider.getCurrentStep().toString();
+        percentageDisplay.textContent = mySlider.getPercentage().toFixed(2);
+    </script>
+</body>
+</html>

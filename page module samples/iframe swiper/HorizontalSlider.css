@@ -1,0 +1,21 @@
+/* 컨테이너 */
+.horizontal-slider-container {
+    display: flex; /* 가로 배열 */
+    overflow-x: scroll; /* 가로 스크롤 허용 */
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth; /* JS로 변경 시 */
+    scrollbar-width: none; /* 스크롤바 숨김(Firefox) */
+    -ms-overflow-style: none; /* 스크롤바 숨김(IE/Edge) */
+    cursor: grab;
+}
+/* 스크롤바 숨김 */
+.horizontal-slider-container::-webkit-scrollbar {
+    display: none;
+}
+
+/* 아이템 */
+.horizontal-slider-item {
+    flex-shrink: 0;
+    width: 100%;
+    scroll-snap-align: start;
+}

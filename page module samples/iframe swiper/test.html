@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="swiper"
+        style="width: 90%; height: 600px; background-color: rgba(199, 199, 199, 0.3); margin: auto;">
+        <div style="width: 300px; height: 200px; text-align: center; background-color: rgba(226, 1, 1, 0.1);"
+            data-is-page>
+            TEST
+        </div>
+        <div style="width: 300px; height: 200px; text-align: center; background-color: rgba(1, 225, 1, 0.1);"
+            data-is-page>
+            YEEEEEEEE
+        </div>
+    </div>
+    <script>
+        function clamp(x, a, b){
+            if(x < a) return a
+            if(b < x) return b
+            return x
+        }
+
+        class Swipeable {
+            cont = null // container
+            containerWidth = 0
+            highlighted = 0 // 하이라이트된 페이지
+            originX = 0 // 컨테이너 중심 x좌표(width/2, px)
+            // offsetX = 0 // 오른쪽(+)으로 밀린 정도(px)
+            animation = true; setAnimation(go){ this.animation = !!go } // 애니메이션 여부
+            startX = 0 // 애니메이션용 - 클릭 시작 X
+            targetX = 0 // 애니메이션용 - 클릭 끝 X
+            pages = []
+            $gap = [200] // px
+            get gap(){ return this.$gap.slice() }
+            set gap(v){
+                if(Array.isArray(v)){
+                    this.$gap = v.filter(gap => typeof gap === 'number')
+                    if(this.$gap.length === 0){
+                        this.$gap = [100]
+                        throw new TypeError("gap(s) must be number[>0]")
+                    }
+                } else if(typeof v === 'number' && v > 0)
+                    this.$gap = [v]
+                else
+                    throw new TypeError("gap(s) must be number[>0]")
+            }
+            // 요소 크기 변경 시 동적으로 조정
+            resizer = null
+
+            constructor(element){
+                if(element instanceof HTMLElement)
+                    this.init(element)
+                else
+                    console.error("요소 입력 필수")
+            }
+            init(cont){
+                this.cont = cont
+                cont.style.position = 'relative'
+                this.originX = (
+                    this.containerWidth = parseFloat(window.getComputedStyle(cont).width)
+                ) / 2
+
+                Array.from(cont.children).filter(e => e.hasAttribute('data-is-page'))
+                    .forEach(e => {
+                        this.initPage(e)
+                        this.pages.push(e)
+                    })
+
+                this.initPagePositions()
+                this.initSizeObserver()
+            }
+            initSizeObserver(){
+                if(this.resizer !== null)
+                    this.resizer.disconnect()
+
+                this.resizer = new ResizeObserver(entry => { // 컨테이너만 관측
+                    entry = entry[0]
+                    this.containerWidth = entry.contentRect.width
+                    this.originX = this.containerWidth / 2
+
+                    this.initPagePositions()
+                    this.highlighted = this.calculateHighlighted()
+                })
+
+                this.resizer.observe(this.cont)
+            }
+            initPage(e){ // element
+                if(!e.style.display.includes('block'))
+                    e.style.display = 'block'
+                // 좌표 기반 배치가 가능하도록 + 높이는 기본적으로 중간
+                e.style.position = 'absolute'
+                e.style.top = '50%'
+                e.style.transform = "translate(-50%, -50%)"
+
+                // 중심으로부터의 거리에 따른 불투명도와 스케일
+                // e.style.setAttribute('--distance', '0%')
+                // e.style.opacity = "calc((100% - abs(var(--distance))) / 100%)"
+                // e.style.transform += " scale(calc(100% - abs(var(--distance))))"
+            }
+            initPagePositions(){
+                this.pages.forEach((page, i) => this.setPageX(i, this.calculateX(i)))
+            }
+            getPagePosition(i){
+                if(i < 0 || this.pages.length < i)
+                    throw new Error("페이지 인덱스 이탈")
+                return parseFloat(this.pages[i].style.left)
+            }
+            calculateDistanceFromOrigin(i){
+                if(i < 0 || this.pages.length < i)
+                    throw new Error("페이지 인덱스 이탈")
+                return Math.abs(this.originX - this.getPagePosition(i))
+            }
+            setPageX(i, x){
+                if(i < 0 || this.pages.length < i)
+                    throw new Error("페이지 인덱스 이탈")
+                const page = this.pages[i]
+                page.style.left = x+'px'
+                this.styleByDistanceFromOrigin(page, this.calculateDistanceFromOrigin(i))
+            }
+            styleByDistanceFromOrigin(page, distance){
+                // assert page is Page
+                // 불투명도+스케일 조정 적용; 끝에서 완전히 사라지도록
+                const near = (this.originX*1.5 - distance)/this.originX/1.5
+                page.style.opacity = near.toString()
+                if(page.style.transform.includes('scale'))
+                    page.style.transform = page.style.transform.replace(/scale\(.+\)/, `scale(${near*100}%)`)
+                else
+                    page.style.transform += ` scale(${Math.cbrt(near) *100}%)`
+            }
+
+
+            // 하이라이트(중심) 기준 각 페이지별 핀 좌표(x) 계산
+            calculateX(page){
+                const d_page = page - this.highlighted
+                return this.originX
+                    + this.$gap.slice(0, Math.min(Math.abs(d_page), this.$gap.length))
+                        .reduce((a, v) => a+v, 0) * (d_page > 0? 1: -1)
+            }
+            calculateHighlighted(){
+                const calculateDistance = page => Math.abs(this.originX - parseFloat(page.style.left))
+                let res = 0
+                let distance = calculateDistance(this.pages[0])
+                for(let i = 1, dx; i < this.pages.length; i++){
+                    dx = calculateDistance(this.pages[i])
+                    if(dx < distance){
+                        res = i
+                        distance = dx
+                    }
+                }
+                return res
+            }
+            // 모든 일괄 이동 시 애니메이션 처리 관장(개별 페이지 애니메이션 처리는 부하 때문에 패스)
+            swipe(dx){
+                if(this.animation){
+                    // todo
+                }
+
+
+                // this.offsetX += dx
+                this.pages.forEach((page, i) => {
+                    this.setPageX(i, parseFloat(page.style.left) + dx)
+                })
+            }
+
+            setHighlighted(idx){
+                if(idx < 0 || this.pages.length < idx)
+                    throw new RangeError(`없는 페이지 ${i}`)
+                this.swipe(this.originX - parseFloat(this.pages[idx].style.left))
+                this.highlighted = idx
+            }
+            swipePage(di){
+                if(di === 0) return
+                // todo: repeatable
+                this.setHighlighted(clamp(this.highlighted + di, 0, this.pages.length-1))
+            }
+            snap(){
+                this.setHighlighted(this.calculateHighlighted())
+            }
+
+
+            // 마우스 조작
+            handleMouseDown = e => { // 컨테이너 위 클릭
+                this.startX = e.clientX
+                document.body.addEventListener(this.handleMouseMove)
+                document.body.addEventListener(this.handleMouseUp)
+            }
+        }
+
+
+        var swiper = new Swipeable(document.getElementById('swiper'))
+    </script>
+</body>
+</html>
