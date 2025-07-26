@@ -1,5 +1,43 @@
 import Swipeable from "./Swipeable.js"
 
+const PAGE_VIEWPORT_WIDTH = 1200 // px
+const PAGE_SCALE = 1/4
+const PAGE_ASPECT_RATIO = 9/12 // width/height
+
+const Template = [
+    {
+        id: "koine",
+        pages: [
+            'exercises/Abstract/index.html',
+            'exercises/Ableton/index.html'
+        ]
+    },
+    {
+        id: "duckgu",
+        pages: [
+            
+        ]
+    },
+    {
+        id: "juha",
+        pages: [
+            
+        ]
+    },
+    {
+        id: "suuung",
+        pages: [
+            
+        ]
+    },
+    {
+        id: "amaii",
+        pages: [
+
+        ]
+    }
+]
+
 
 // 타 페이지 제작. 단순하게 쓸거라 그냥 함수 하나로 퉁치기.
 /**
@@ -9,7 +47,8 @@ import Swipeable from "./Swipeable.js"
  * @param {number} scale 메인페이지에서 조절할 스케일
  * @returns {HTMLIFrameElement}
  */
-function createScaledIframeThumbnail(src, width, height, scale, asAnchor){
+function createScaledIframeThumbnail(src, proxySrc, width=PAGE_VIEWPORT_WIDTH,
+        height=PAGE_VIEWPORT_WIDTH*PAGE_SCALE/PAGE_ASPECT_RATIO, scale=PAGE_SCALE, asAnchor=true){
     const iframe = document.createElement('iframe')
     iframe.src = src
     iframe.width = width * scale
@@ -36,7 +75,7 @@ function createScaledIframeThumbnail(src, width, height, scale, asAnchor){
 
     if(asAnchor){
         const a = document.createElement('a')
-        a.href = src
+        a.href = proxySrc ?? src
         a.target = "_blank"
 
         a.style.display = "block"
@@ -50,9 +89,17 @@ function createScaledIframeThumbnail(src, width, height, scale, asAnchor){
 
 
 const pageContainer = document.getElementById('swiper-test')
-const pageSamples = ['exercises/Abstract/index.html', 'exercises/Ableton/index.html']
+const pageSamples = [
+    'exercises/Abstract/index.html',
+    'exercises/Ableton/index.html',
+    ['page-wrapper/lobe.html', 'https://suuuunng.github.io/front-practice/']
+]
 for(let src of pageSamples){
-    let iframe = createScaledIframeThumbnail(src, 1200, 500, 2/5, true)
+    let iframe
+    if(Array.isArray(src))
+        iframe = createScaledIframeThumbnail(src[0], src[1])
+    else
+        iframe = createScaledIframeThumbnail(src)
     iframe.setAttribute('data-is-page', '')
 
     // url로 이어지는 앵커 추가
@@ -64,4 +111,6 @@ for(let src of pageSamples){
 const swiper = new Swipeable(pageContainer)
 swiper.setAnimation(true)
 
-window.createScaledIframeThumbnail = createScaledIframeThumbnail
+
+
+

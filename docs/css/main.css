@@ -1,0 +1,57 @@
+body {
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: 140px 1fr;
+}
+
+.wave-container {
+    width: 100%;
+    height: 10vh;
+    background-color: lightgreen; /* 구분용 임시 배경색 */
+}
+
+.view {
+    display: flex;
+    width: 100%;
+    height: 80vh;
+}
+
+.selections {
+    flex-grow: 0;
+    width: 140px; height: 100%;
+
+    background-color: lightcyan;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+.icon-wrapper { /* 위치, 크기용 */
+    width: 40%;
+}
+.icon-wrapper > button {
+    overflow: hidden;
+    transition: all 0.2s ease-out;
+    /* 둥둥 떠다니는 느낌을 줘도 괜찮을 듯 */
+}
+.icon-wrapper > button > img {
+    border-radius: 100px;
+}
+
+/* 선택 시 */
+.icon-wrapper > button.selected {
+    transform: translateX(100%);
+}
+
+
+.page-preview {
+    width: 100%; height:100%;
+}
+
+
+
+.swiper {
+    width: 100%; height: 100%;
+    background-color: rgb(255,255,255);
+}

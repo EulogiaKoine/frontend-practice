@@ -1,0 +1,1 @@
+const iconButtons = document.querySelectorAll('nav.selections > di')

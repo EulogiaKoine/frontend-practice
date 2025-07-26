@@ -6,57 +6,33 @@
         <title>2025 FrontEnd - Koine</title>
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/base.css">
-        <link rel="stylesheet" href="css/yeah.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <script type="module" src="js/main.js"></script>
         <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
-        <style>
-            :root {
-                --header-height: 60px;
-            }
-
-            header {
-                background-color: black;
-                text-align: center;
-                font-family: 'Times New Roman', 'Times', 'serif';
-                text-shadow: 1px 1px 1px lightskyblue;
-                color: #F5F5F5; /* whitesmoke(w3c) */
-                height: var(--header-height);
-                display: flex;
-                justify-content: center;
-                align-items: center; 
-                position: sticky; /* statkc -> 스크롤 시 fixed */
-                width: 100%;
-                font-size: 2rem;
-                z-index: 1000;
-            }
-
-            main {
-                padding: 5px;
-            }
-
-            p {
-                font-family: "Jua", sans-serif;
-                font-style: normal;
-                font-size: 20px;
-            }
-
-            *[data-is-page] {
-                outline: none;
-                border: none;
-            }
-        </style>
+        <link rel="stylesheet" href="css/main.css">
     </head>
     <body>
-        <header>Exercises</header>
-        <main>
-            <p>2025년 Clab 프론트엔드 스터디</p>
-            <p>참여자 오경석의 연습용 페이지 모음입니다.</p>
-            <hr>
-            <div id="swiper-test" style="width: 90%; height: 80vh; margin: auto; background-color: lightgray;">
-                <!-- js로 삽입 -->
-            </div>
-        </main>
+        <div id="wave-top" class="wave-container"></div>
+        <div class="view">
+            <nav class="selections">
+                <div class="icon-wrapper">
+                    <button id="sample">
+                        <img src="img/koine_profile_축소_배경투명화.png" width="100%" style="aspect-ratio: 1/1;" alt="">
+                    </button>
+                </div>
+                <div class="icon-wrapper">
+                    <button id="sample">
+                        <img src="img/koine_profile_축소_배경투명화.png" width="100%" style="aspect-ratio: 1/1;" alt="">
+                    </button>
+                </div>
+            </nav>
+            <main class="page-preview">
+                <div id="swiper-test" class="swiper">
+                    <!-- js로 삽입 -->
+                </div>
+            </main>
+        </div>
+        <div id="wave-bottom" class="wave-container"></div>
     </body>
 </html>
