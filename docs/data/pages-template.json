@@ -1,0 +1,39 @@
+[
+    {
+        "id": "koine",
+        "icon": "img/koine_profile_축소_배경투명화.png",
+        "pages": [
+            "exercises/Abstract/index.html",
+            "exercises/Ableton/index.html"
+        ]
+    },
+    {
+        "id": "duckgu",
+        "icon": "img/duckgu.png",
+        "pages": [
+            ["page-wrapper/duckguhouse.html","https:/\/duckgu88.github.io/DuckGuHouse/"]
+        ]
+    },
+    {
+        "id": "juha",
+        "icon": "img/juha.png",
+        "pages": [
+            ["page-wrapper/kleft1.html","https:/\/kleft0925.github.io/kleft/"],
+            ["page-wrapper/kleft2.html","https:/\/kleft0925.github.io/"]
+        ]
+    },
+    {
+        "id": "suuung",
+        "icon": "img/suuung.png",
+        "pages": [
+            ["page-wrapper/lobe.html","https.suuuunng.github.io/front-practice/" ]
+        ]
+    },
+    {
+        "id": "amaii",
+        "icon": "img/hina.jpg",
+        "pages": [
+            ["page-wrapper/amaii1.html", "https:/\/amaii135.github.io/-amaii135-.github.io/"]
+        ]
+    }
+]

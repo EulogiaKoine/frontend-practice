@@ -4,39 +4,22 @@ const PAGE_VIEWPORT_WIDTH = 1200 // px
 const PAGE_SCALE = 1/4
 const PAGE_ASPECT_RATIO = 9/12 // width/height
 
-const Template = [
-    {
-        id: "koine",
-        pages: [
-            'exercises/Abstract/index.html',
-            'exercises/Ableton/index.html'
-        ]
-    },
-    {
-        id: "duckgu",
-        pages: [
-            
-        ]
-    },
-    {
-        id: "juha",
-        pages: [
-            
-        ]
-    },
-    {
-        id: "suuung",
-        pages: [
-            
-        ]
-    },
-    {
-        id: "amaii",
-        pages: [
 
-        ]
+async function loadJSONFile(path){
+    try {
+        const res = await fetch(path)
+        if(!res.ok)
+            throw new Error(`HTTP error! status: ${res.status}`)
+        return await res.json()
+    } catch(e) {
+        console.error(e)
+        return null
     }
-]
+}
+// test -> success
+// loadJSONFile('data/pages-template.json').then(res => {
+//     console.log(res)
+// })
 
 
 // 타 페이지 제작. 단순하게 쓸거라 그냥 함수 하나로 퉁치기.

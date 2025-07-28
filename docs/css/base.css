@@ -2,7 +2,13 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    user-select: none;
 }
+
+/* 드래그 선택 효과 제거 -> user-select: none으로 대체 */
+/* ::selection {
+  background-color: transparent;
+} */
 
 /* 버튼 스타일 제거 */
 button {
