@@ -55,19 +55,22 @@ export default class Swipeable {
     lastMouseX = 0
 
     constructor(element){
-        if(element instanceof HTMLElement)
+        if(element instanceof Node)
             this.init(element)
-        else
+        else {
             console.error("요소 입력 필수")
+            throw new TypeError()
+        }
         
         // gap의 초기값 설정 및 관련 초기화 로직 호출
         // setter를 통해 gap을 설정하면 관련 계산이 자동으로 수행됨
-        this.gap = 0 
+        // this.gap = 0 
     }
 
     init(cont){
         this.cont = cont
-        cont.style.position = 'relative'
+        if(cont.style.position === 'static')
+            cont.style.position = 'relative'
         cont.style.overflow = 'hidden'
 
         this.originX = (this.containerWidth = parseFloat(window.getComputedStyle(cont).width)) / 2

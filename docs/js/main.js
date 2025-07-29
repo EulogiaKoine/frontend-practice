@@ -3,8 +3,22 @@ import Swipeable from "./Swipeable.js"
 const PAGE_VIEWPORT_WIDTH = 1200 // px
 const PAGE_SCALE = 1/4
 const PAGE_ASPECT_RATIO = 9/12 // width/height
-const THUMBNAIL_STYLE_CLASS = 'page-thumbnail'
-const PAGE_SCROLLWIDTH = '15px'
+const PAGE_SCROLLWIDTH = 15
+const PROFILE_WIDTH = 80
+const PROFILE_HEIGHT = PROFILE_WIDTH
+
+const Templates = {
+    PAGE_PREVIEW: 'page-preview-swiper',
+    PROFILE: 'profile-template'
+}
+
+const CSS_class = {
+    THUMBNAIL_STYLE: 'page-thumbnail',
+    SWIPER: 'swiper',
+    SWIPER_HIDDEN: 'swiper-hidden',
+    PROFILE: 'profile-icon',
+    PROFILE_SELECTED: 'profile-icon-selecte'
+}
 
 
 async function loadJSONFile(path){
@@ -48,7 +62,7 @@ function createScaledIframeThumbnail(src, scale=PAGE_SCALE,
     // 페이지 띄울 iframe
     const iframe = document.createElement('iframe')
     iframe.src = src
-    iframe.style.width = `calc(100% + ${PAGE_SCROLLWIDTH})`
+    iframe.style.width = `calc(100% + ${PAGE_SCROLLWIDTH}px)`
     iframe.style.height = '100%'
     iframe.style.backgroundColor = 'rgb(255,255,255)'
     // 상호작용 차단(썸네일용이므로)
@@ -75,32 +89,107 @@ function createScaledIframeThumbnail(src, scale=PAGE_SCALE,
     thumbnail_container.appendChild(scaled_wrapper)
 
     // 스타일용 클래스 추가
-    thumbnail_container.classList.add(THUMBNAIL_STYLE_CLASS)
+    thumbnail_container.classList.add(CSS_class.THUMBNAIL_STYLE)
     
     return thumbnail_container
 }
 
 
-const pageContainer = document.getElementById('swiper-test')
-const pageSamples = [
-    'exercises/Abstract/index.html',
-    'exercises/Ableton/index.html',
-    'https://suuuunng.github.io/front-practice/'
-]
-for(let src of pageSamples){
-    let iframe
-    if(0 && Array.isArray(src))
-        iframe = createScaledIframeThumbnail(src[0] /*, src[1] */)
-    else
-        iframe = createScaledIframeThumbnail(src)
-    iframe.setAttribute('data-is-page', '')
-
-    pageContainer.appendChild(iframe)
+// 현재 보여지는 페이지들
+const highlighted = {
+    profile: null,
+    swiper: null
 }
 
-const swiper = new Swipeable(pageContainer)
-swiper.setAnimation(true)
 
+/**
+ * @param {string} id 
+ * @param {string[]} pages [page url, ...] 
+ */
+function createSwiper(id, pages){
+    const template = document.getElementById(Templates.PAGE_PREVIEW)
+    if(template === null){
+        console.error(`no template id ${Templates.PAGE_PREVIEW}`)
+        return null
+    }
 
+    const swiper = template.content.cloneNode(true).children[0]
+    swiper.id = id + '-swiper'
 
+    let childPage
+    pages.forEach(url => {
+        childPage = createScaledIframeThumbnail(url)
+        childPage.setAttribute('data-is-page', '')
+        swiper.appendChild(childPage)
+    })
 
+    const swipeHandler = new Swipeable(swiper)
+    swipeHandler.setAnimation(true)
+
+    return swiper
+}
+
+/**
+ * 
+ * @param {string} id 
+ * @param {string} src 
+ */
+function createProfile(id, src){
+    const template = document.getElementById(Templates.PROFILE)
+    if(template === null){
+        console.error(`no template id ${Templates.PROFILE}`)
+        return null
+    }
+
+    const profile = template.content.cloneNode(true).children[0] // .icon-wrapper
+    profile.id = `${id}-profile`
+
+    // button
+    const button = profile.children[0]
+    button.addEventListener('click', () => highlight(id))
+
+    // img
+    button.children[0].src = src
+
+    return profile
+}
+
+function highlight(id){
+    const profile = document.getElementById(`${id}-profile`)
+    const swiper = document.getElementById(`${id}-swiper`)
+    if(!(profile && swiper)){
+        console.error(`cannot find profile or swiper with id '${id}'`)
+        return
+    }
+
+    if(highlighted.profile === profile && highlighted.swiper === swiper){
+        console.info(`already highlighted such id ${id}`)
+        return
+    }
+
+    // 프로필 스타일 변경
+    if(highlighted.profile?.classList.contains(CSS_class.PROFILE_SELECTED))
+        highlighted.profile.classList.remove(CSS_class.PROFILE_SELECTED)
+    highlighted.profile = profile
+    if(!profile.classList.contains(CSS_class.PROFILE_SELECTED))
+        profile.classList.add(CSS_class.PROFILE_SELECTED)
+
+    // 프리뷰 전환
+    if(!highlighted.swiper?.classList.contains(CSS_class.SWIPER_HIDDEN))
+        highlighted.swiper?.classList.add(CSS_class.SWIPER_HIDDEN)
+    highlighted.swiper = swiper
+    if(swiper.classList.contains(CSS_class.SWIPER_HIDDEN))
+        swiper.classList.remove(CSS_class.SWIPER_HIDDEN)
+}
+
+const profile_container = document.getElementById('profiles')
+const page_preview_container = document.getElementById('page-preview')
+loadJSONFile('data/pages-template.json').then(data => {
+    data.forEach(info => {
+        profile_container.appendChild(createProfile(info.id, info.icon))
+        page_preview_container.appendChild(createSwiper(info.id, info.pages))
+    })
+    highlight(data[0].id)
+})
+
+window.highlight = highlight

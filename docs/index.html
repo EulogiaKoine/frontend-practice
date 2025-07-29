@@ -15,22 +15,21 @@
     <body>
         <div id="wave-top" class="wave-container"></div>
         <div class="view">
-            <nav class="selections">
-                <div class="icon-wrapper">
-                    <button id="sample">
-                        <img src="img/koine_profile_축소_배경투명화.png" width="100%" style="aspect-ratio: 1/1;" alt="">
-                    </button>
-                </div>
-                <div class="icon-wrapper">
-                    <button id="sample">
-                        <img src="img/koine_profile_축소_배경투명화.png" width="100%" style="aspect-ratio: 1/1;" alt="">
-                    </button>
-                </div>
+            <nav id="profiles" class="selections">
+                <template id="profile-template">
+                    <div class="icon-wrapper profile-icon" id="">
+                        <button>
+                            <img src="" style="width: 100%; aspect-ratio: 1/1;">
+                        </button>
+                    </div>
+                </template>
             </nav>
-            <main class="page-preview">
-                <div id="swiper-test" class="swiper">
-                    <!-- js로 삽입 -->
-                </div>
+            <main id="page-preview" class="page-preview">
+                <template id="page-preview-swiper">
+                    <div id="" class="swiper swiper-hidden">
+                        <!-- js로 삽입 -->
+                    </div>
+                </template>
             </main>
         </div>
         <div id="wave-bottom" class="wave-container"></div>
