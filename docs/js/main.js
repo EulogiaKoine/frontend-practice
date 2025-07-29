@@ -3,6 +3,8 @@ import Swipeable from "./Swipeable.js"
 const PAGE_VIEWPORT_WIDTH = 1200 // px
 const PAGE_SCALE = 1/4
 const PAGE_ASPECT_RATIO = 9/12 // width/height
+const THUMBNAIL_STYLE_CLASS = 'page-thumbnail'
+const PAGE_SCROLLWIDTH = '15px'
 
 
 async function loadJSONFile(path){
@@ -30,44 +32,52 @@ async function loadJSONFile(path){
  * @param {number} scale 메인페이지에서 조절할 스케일
  * @returns {HTMLIFrameElement}
  */
-function createScaledIframeThumbnail(src, proxySrc, width=PAGE_VIEWPORT_WIDTH,
-        height=PAGE_VIEWPORT_WIDTH*PAGE_SCALE/PAGE_ASPECT_RATIO, scale=PAGE_SCALE, asAnchor=true){
+function createScaledIframeThumbnail(src, scale=PAGE_SCALE,
+    width=PAGE_VIEWPORT_WIDTH, height=width/PAGE_ASPECT_RATIO,
+    asAnchor=true)
+{
+    // 띄울 페이지 프레임(스케일 조절 및 컨테이너용)
+    const scaled_wrapper = document.createElement('div')
+    // 크기+스케일 조절
+    scaled_wrapper.style.width = `${width}px`
+    scaled_wrapper.style.height = `${height}px`
+    scaled_wrapper.style.transform = `scale(${scale})`
+    scaled_wrapper.style.overflow = 'hidden' // 스크롤바 가리게
+    scaled_wrapper.style.transformOrigin = '0 0'
+    
+    // 페이지 띄울 iframe
     const iframe = document.createElement('iframe')
     iframe.src = src
-    iframe.width = width * scale
-    iframe.height = height
+    iframe.style.width = `calc(100% + ${PAGE_SCROLLWIDTH})`
+    iframe.style.height = '100%'
     iframe.style.backgroundColor = 'rgb(255,255,255)'
-    iframe.style.setProperty('pointer-events', 'none', 'important')
-    iframe.style.border = "none"
+    // 상호작용 차단(썸네일용이므로)
+    iframe.style.pointerEvents = 'none'
+    // 깔끔하게 외곽선은 없애기
+    iframe.style.border = 'none'
+    scaled_wrapper.appendChild(iframe)
 
-    iframe.onload = () => {
-        try{ 
-            const body = iframe.contentDocument.body || iframe.contentWindow.document.body
-            body.style.width = `${width}px`
-            body.style.transformOrigin = '0 0'
-            body.style.transform = `scale(${scale})`
-
-            // 스크롤 삭제
-            body.style.overflow = 'hidden'
-            // 상호작용 차단
-            body.style.setProperty('pointer-events', 'none', 'important')
-        } catch(e){
-            console.log(e)
-        }
+    // 외부 컨트롤용 컨테이너로 한 번 더 감싸기
+    let thumbnail_container
+    if(asAnchor){ // 컨테이너를 앵커로
+        thumbnail_container = document.createElement('a')
+        thumbnail_container.href = src
+        thumbnail_container.target = '_blank'
+    } else {
+        thumbnail_container = document.createElement('div')
     }
+    thumbnail_container.style.display = 'flex'
+    thumbnail_container.style.justifyContent = 'center'
+    thumbnail_container.style.alignItems = 'center'
+    thumbnail_container.style.width = `${width * scale}px`
+    thumbnail_container.style.height = `${height * scale}px`
+    thumbnail_container.style.overflow = 'hidden'
+    thumbnail_container.appendChild(scaled_wrapper)
 
-    if(asAnchor){
-        const a = document.createElement('a')
-        a.href = proxySrc ?? src
-        a.target = "_blank"
-
-        a.style.display = "block"
-        a.style.backgroundColor = "white"
-        a.appendChild(iframe)
-        return a
-    }
-
-    return iframe
+    // 스타일용 클래스 추가
+    thumbnail_container.classList.add(THUMBNAIL_STYLE_CLASS)
+    
+    return thumbnail_container
 }
 
 
@@ -75,18 +85,15 @@ const pageContainer = document.getElementById('swiper-test')
 const pageSamples = [
     'exercises/Abstract/index.html',
     'exercises/Ableton/index.html',
-    ['page-wrapper/lobe.html', 'https://suuuunng.github.io/front-practice/']
+    'https://suuuunng.github.io/front-practice/'
 ]
 for(let src of pageSamples){
     let iframe
-    if(Array.isArray(src))
-        iframe = createScaledIframeThumbnail(src[0], src[1])
+    if(0 && Array.isArray(src))
+        iframe = createScaledIframeThumbnail(src[0] /*, src[1] */)
     else
         iframe = createScaledIframeThumbnail(src)
     iframe.setAttribute('data-is-page', '')
-
-    // url로 이어지는 앵커 추가
-    
 
     pageContainer.appendChild(iframe)
 }
