@@ -20,7 +20,7 @@ body {
     flex-grow: 0;
     width: 140px; height: 100%;
 
-    background-color: lightcyan;
+    /* background-color: lightcyan; */
 
     display: flex;
     flex-direction: column;
@@ -29,19 +29,36 @@ body {
 }
 .icon-wrapper { /* 위치, 크기용 */
     width: 40%;
-}
-.icon-wrapper > button {
-    overflow: hidden;
-    transition: all 0.2s ease-out;
-    /* 둥둥 떠다니는 느낌을 줘도 괜찮을 듯 */
-}
-.icon-wrapper > button > img {
-    border-radius: 100px;
+    transform: translateX(-20%);
+    transition: transform 0.2s ease-in-out;
 }
 
-/* 선택 시 */
-.icon-wrapper > button.selected {
-    transform: translateX(100%);
+.profile-icon {
+    border-radius: 100px;
+    overflow: hidden;
+    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.6);
+
+    animation-name: float;
+    animation-duration: 5s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+}
+.profile-icon-selected {
+    transform: translateX(40%);
+}
+@keyframes float {
+	0% {
+		box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.6);
+		transform: translateY(0px);
+	}
+	50% {
+		box-shadow: 0px 5px 5px 0px rgba(0, 0, 0, 0.6);
+		transform: translateY(-3px);
+	}
+	100% {
+		box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.6);
+		transform: translateY(0px);
+	}
 }
 
 
@@ -54,10 +71,16 @@ body {
     position: absolute;
     width: 100%; height: 100%;
     background-color: rgb(255,255,255);
-    transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.2s ease-in-out;
     z-index: 0;
 }
 .swiper-hidden {
     opacity: 0;
     z-index: -1;
+}
+
+/* 페이지 스타일 */
+.swiper > * {
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25),
+                0 10px 10px rgba(0,0,0,0.22);
 }

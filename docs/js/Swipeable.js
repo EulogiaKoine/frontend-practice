@@ -193,6 +193,9 @@ export default class Swipeable {
         page.style.transform = transformStr
 
         page.style.zIndex = Math.floor(clamp(near, 0, 1) * 100)
+
+        // 반투명하게
+        page.style.opacity = Math.log(near + 0.5) * (1 / Math.log(1.5)) // (1,1)을 지나도록
     }
 
     calculateHighlighted(){

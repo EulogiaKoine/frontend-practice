@@ -17,7 +17,7 @@ const CSS_class = {
     SWIPER: 'swiper',
     SWIPER_HIDDEN: 'swiper-hidden',
     PROFILE: 'profile-icon',
-    PROFILE_SELECTED: 'profile-icon-selecte'
+    PROFILE_SELECTED: 'profile-icon-selected'
 }
 
 
@@ -141,21 +141,22 @@ function createProfile(id, src){
         return null
     }
 
-    const profile = template.content.cloneNode(true).children[0] // .icon-wrapper
+    const wrapper = template.content.cloneNode(true).children[0]
+    const profile = wrapper.querySelector('.profile-icon') // .icon-wrapper
     profile.id = `${id}-profile`
 
     // button
-    const button = profile.children[0]
+    const button = profile.querySelector('button')
     button.addEventListener('click', () => highlight(id))
 
     // img
     button.children[0].src = src
 
-    return profile
+    return wrapper
 }
 
 function highlight(id){
-    const profile = document.getElementById(`${id}-profile`)
+    const profile = document.getElementById(`${id}-profile`).parentElement
     const swiper = document.getElementById(`${id}-swiper`)
     if(!(profile && swiper)){
         console.error(`cannot find profile or swiper with id '${id}'`)
@@ -192,4 +193,3 @@ loadJSONFile('data/pages-template.json').then(data => {
     highlight(data[0].id)
 })
 
-window.highlight = highlight
