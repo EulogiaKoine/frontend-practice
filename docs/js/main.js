@@ -151,6 +151,7 @@ function createProfile(id, src){
 
     // img
     button.children[0].src = src
+    button.children[0].title = id
 
     return wrapper
 }
